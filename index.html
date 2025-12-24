@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head><meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nông Trại Triết Học - Philosophy Farm</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: #87ceeb;
+    }
+    
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #canvas-container {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+    #ui-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    
+    #ui-overlay > * {
+      pointer-events: auto;
+    }
+    
+    /* Frosted Glass Effect */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+    }
+    
+    /* Health Bar */
+    #health-bar-container {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 20;
+    }
+    
+    #health-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 8px;
+      padding: 8px 16px;
+    }
+    
+    #health-bar .progress-container {
+      flex: 1;
+      height: 12px;
+      background: #374151;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    
+    #health-bar .progress-fill {
+      height: 100%;
+      transition: all 0.5s ease;
+      border-radius: 9999px;
+    }
+    
+    #health-bar span {
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    #health-bar .error-count {
+      color: #f87171;
+    }
+    
+    #health-bar .divider {
+      color: #9ca3af;
+    }
+    
+    /* Question Panel - Bottom 1/3 */
+    #question-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 33.333vh;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+    
+    #question-text {
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      min-height: 2.5rem;
+    }
+    
+    #options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .option-btn {
+      position: relative;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: rgba(51, 65, 85, 0.8);
+      color: white;
+      text-align: left;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    
+    .option-btn:hover:not(:disabled) {
+      background: rgba(71, 85, 105, 0.8);
+      border-color: #64748b;
+    }
+    
+    .option-btn:disabled {
+      cursor: not-allowed;
+    }
+    
+    .option-btn.correct {
+      background: rgba(22, 163, 74, 0.9);
+      border-color: #4ade80;
+    }
+    
+    .option-btn.wrong {
+      background: rgba(220, 38, 38, 0.9);
+      border-color: #f87171;
+    }
+    
+    .option-btn.dimmed {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: #475569;
+      color: #9ca3af;
+    }
+    
+    .option-btn .letter {
+      color: #4ade80;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    
+    .option-btn .text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* Feedback Message */
+    #feedback {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    
+    #feedback.correct {
+      color: #4ade80;
+    }
+    
+    #feedback.wrong {
+      color: #f87171;
+    }
+    
+    /* Recovery Header */
+    #recovery-header {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    
+    #recovery-header .title {
+      color: #f87171;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    #recovery-header .subtitle {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    
+    #recovery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    
+    #recovery-dots .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4b5563;
+    }
+    
+    #recovery-dots .dot.filled {
+      background: #22c55e;
+    }
+    
+    /* Center Panels (Start, Milestone, Victory, Defeat) */
+    .center-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    
+    .center-card {
+      padding: 32px;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .center-card h1 {
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .center-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .center-card h2.victory {
+      color: #facc15;
+    }
+    
+    .center-card h2.defeat {
+      color: #f87171;
+    }
+    
+    .center-card p {
+      color: #d1d5db;
+      margin-bottom: 16px;
+    }
+    
+    .center-card .hint {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    
+    .center-card .stats {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    
+    .btn-green {
+      background: #16a34a;
+      color: white;
+    }
+    
+    .btn-green:hover {
+      background: #15803d;
+    }
+    
+    .btn-amber {
+      background: #d97706;
+      color: white;
+    }
+    
+    .btn-amber:hover {
+      background: #b45309;
+    }
+    
+    .btn-blue {
+      background: #2563eb;
+      color: white;
+    }
+    
+    .btn-blue:hover {
+      background: #1d4ed8;
+    }
+    
+    .btn-slate {
+      background: #475569;
+      color: white;
+    }
+    
+    .btn-slate:hover {
+      background: #64748b;
+    }
+    
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    /* Back Button */
+    #back-btn-container {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="canvas-container"></div>
+    
+    <div id="ui-overlay">
+      <!-- Start Screen -->
+      <div id="start-screen" class="center-panel">
+        <div class="glass-card center-card">
+          <h1>Nong Trai Triet Hoc</h1>
+          <p>Tra loi dung de nuoi duong sinh vat cua ban</p>
+          <p class="hint">Chon con duong cua ban:</p>
+          <div class="btn-group">
+            <button class="btn btn-green" onclick="startGame('flora')">🌱 Thuc vat</button>
+            <button class="btn btn-amber" onclick="startGame('fauna')">🐔 Dong vat</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Health Bar -->
+      <div id="health-bar-container" class="hidden">
+        <div id="health-bar">
+          <span id="question-count">Q1/45</span>
+          <div class="progress-container">
+            <div class="progress-fill" id="health-fill" style="width: 100%; background: #22c55e;"></div>
+          </div>
+          <span id="health-percent">100%</span>
+          <span class="divider">|</span>
+          <span class="error-count">Loi: <span id="error-count">0</span></span>
+        </div>
+      </div>
+      
+      <!-- Question Panel -->
+      <div id="question-panel" class="glass-panel hidden">
+        <div id="recovery-header" class="hidden">
+          <span class="title">Che do phuc hoi!</span>
+          <p class="subtitle">Tra loi dung <span id="recovery-remaining">3</span> cau lien tiep de hoi sinh</p>
+          <div id="recovery-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <p id="question-text"></p>
+        <div id="options-grid"></div>
+        <p id="feedback" class="hidden"></p>
+      </div>
+      
+      <!-- Milestone Screen -->
+      <div id="milestone-screen" class="center-panel hidden">
+        <div class="glass-card center-card">
+          <h2 class="victory">Cot moc tien hoa!</h2>
+          <p>Ban da hoan thanh 25 cau hoi. Sinh vat cua ban da truong thanh!</p>
+          <p class="hint">Ban muon:</p>
+          <div class="btn-group">
+            <button class="btn btn-amber" onclick="handleMilestone('harvest')">🎉 Thu hoach</button>
+            <button class="btn btn-green" onclick="handleMilestone('evolve')">🌳 Tien hoa</button>
+          </div>
+          <p class="stats" id="milestone-hint"></p>
+        </div>
+      </div>
+      
+      <!-- Victory Screen -->
+      <div id="victory-screen" class="center-panel hidden">
+        <div class="glass-card center-card">
+          <h2 class="victory">Chien Thang!</h2>
+          <p id="victory-message"></p>
+          <p class="stats" id="victory-stats"></p>
+          <div class="btn-stack">
+            <button class="btn btn-blue" onclick="viewResult()">👁️ Xem thanh tuu</button>
+            <button class="btn btn-green" onclick="saveImage()">📥 Tai ve hinh anh</button>
+            <button class="btn btn-slate" onclick="restartGame()">🔄 Choi lai</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Defeat Screen -->
+      <div id="defeat-screen" class="center-panel hidden">
+        <div class="glass-card center-card">
+          <h2 class="defeat">That Bai</h2>
+          <p>Sinh vat cua ban da khong the song sot...</p>
+          <button class="btn btn-slate" onclick="restartGame()">🔄 Thu lai</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Back Button (when viewing result) -->
+    <div id="back-btn-container" class="hidden">
+      <button class="btn btn-slate" onclick="hideResult()">← Quay lai</button>
+    </div>
+  </div>
+
+  <script>
+    // Questions data
+    const questions = [
+      { id: 1, question: "The gioi quan la gi?", options: ["Quan niem cua con nguoi ve the gioi", "Quan niem cua con nguoi ve tu nhien", "Quan niem cua con nguoi ve chinh con nguoi", "Quan niem cua con nguoi ve the gioi va ve vi tri cua con nguoi trong the gioi do"], correct: 3 },
+      { id: 2, question: "Chi ra cac hinh thuc the gioi quan trong lich su tu tuong?", options: ["The gioi quan duy vat; The gioi quan duy tam", "The gioi quan huyen thoai; The gioi quan ton giao", "The gioi quan ton giao; The gioi quan triet hoc", "The gioi quan huyen thoai; The gioi quan ton giao; The gioi quan triet hoc"], correct: 3 },
+      { id: 3, question: "Sap xep cac hinh thuc the gioi quan theo lich su phat trien cua tu tuong?", options: ["Than thoai; Ton giao; Triet hoc", "Ton giao; Triet hoc; Than thoai", "Triet hoc; Ton giao; Than thoai", "Than thoai; Triet hoc; Ton giao"], correct: 0 },
+      { id: 4, question: "Dau la nguon goc nhan thuc cua triet hoc?", options: ["Su phat trien cua san xuat", "Su phan cong lao dong xa hoi", "Xuat hien lao dong tri oc", "Nhan thuc cua con nguoi dat den trinh do tu duy truu tuong"], correct: 3 },
+      { id: 5, question: "Dau la nguon goc xa hoi cua triet hoc?", options: ["Nhan thuc cua con nguoi dat den trinh do tu duy truu tuong", "Su phat trien cua san xuat vat chat", "Xa hoi phan chia thanh giai cap", "Xa hoi phan chia thanh giai cap va xuat hien lao dong tri oc"], correct: 3 },
+      { id: 6, question: "Triet hoc ra doi vao thoi ky nao?", options: ["The ky VIII (TCN) den the ky VI (TCN)", "The ky VI (TCN) den the ky VIII (SCN)", "The ky VI (TCN) den the ky VI (SCN)", "The ky VIII (TCN) den the ky VIII (SCN)"], correct: 0 },
+      { id: 7, question: "Triet hoc ra doi som nhat o dau?", options: ["An do, Trung Quoc, Hy Lap", "An do, Ai Cap, Hy Lap", "An do, Trung Quoc, Ai Cap", "An do, Hy Lap, La Ma"], correct: 0 },
+      { id: 8, question: "Triet hoc ra doi trong che do nao?", options: ["Cong san nguyen thuy", "Chiem huu no le", "Phong kien", "Chu nghia tu ban"], correct: 1 },
+      { id: 9, question: "Talet quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 0 },
+      { id: 10, question: "Democrit quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 2 },
+      { id: 11, question: "Heraclit quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 1 },
+      { id: 12, question: "Anaximen quan niem, vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 3 },
+      { id: 13, question: "Hinh thuc dau tien cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 0 },
+      { id: 14, question: "Hinh thuc co ban thu hai cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 1 },
+      { id: 15, question: "Hinh thuc co ban thu ba cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 2 },
+      { id: 16, question: "Chu nghia duy vat bien chung do ai sang lap nen?", options: ["C.Mac", "Ph.Anghen", "C.Mac va Anghen", "C.Mac, Anghen va V.I.Lenin"], correct: 2 },
+      { id: 17, question: "Sai lam co ban cua CNDV truoc Mac ve vat chat la:", options: ["Cho rang vat chat duoc cau thanh tu lua.", "Cho rang nguyen tu cau thanh vat chat", "Cho rang nuoc la ban nguyen dau tien cua the gioi", "Dong nhat vat chat voi vat the"], correct: 3 },
+      { id: 18, question: "Theo Heghen, khoi nguyen cua the gioi la gi?", options: ["Ngu hanh", "Nguyen tu", "Y niem", "Y niem tuyet doi"], correct: 3 },
+      { id: 19, question: "Ai la ong to cua CNDT khach quan?", options: ["Platon", "Heghen", "Bekerley", "Phoiobac"], correct: 0 },
+      { id: 20, question: "Bekerley la nha triet hoc thuoc truong phai nao?", options: ["CNDV sieu hinh", "CNDV bien chung", "CNDT khach quan", "CNDT Chu quan"], correct: 3 },
+      { id: 21, question: "Platon, Heghen la nhung nha triet hoc thuoc truong phai nao?", options: ["CNDV sieu hinh", "CNDV bien chung", "CNDT khach quan", "CNDT Chu quan"], correct: 2 },
+      { id: 22, question: "Truong phai nao coi cac yeu to: Kim - Thuy - Moc - Hoa - Tho la khoi nguyen cua the gioi?", options: ["CNDV chat phac", "CNDV sieu hinh", "CNDV bien chung", "Khong co truong phai nao"], correct: 0 },
+      { id: 23, question: "Nha bac hoc nguoi Ba Lan - Nicolai Copecnic - da phat hien dieu gi lam thay doi the gioi quan thoi trung co?", options: ["Trai dat hinh cau", "Thuyet nhat tam", "Thuy trieu tac dong den toc do quay cua trai dat", "Trai dat duoc hinh thanh tu mot khoi tinh van nguyen thuy."], correct: 1 },
+      { id: 24, question: "Van de co ban cua triet hoc la gi?", options: ["Vat chat va y thuc", "Vai tro cua tu nhien doi voi con nguoi", "Moi quan he giua vat chat va y thuc", "Kha nang nhan thuc cua con nguoi."], correct: 2 },
+      { id: 25, question: "Quan diem nao sau day thuoc chu nghia duy tam?", options: ["Vat chat quyet dinh y thuc.", "Y thuc co truoc, vat chat co sau; y thuc quyet dinh vat chat.", "Y thuc tac dong tro lai vat chat", "Vat chat la tinh thu nhat, y thuc la tinh thu hai."], correct: 1 },
+      { id: 26, question: "Quan diem cho rang y thuc co truoc, vat chat co sau la quan diem cua:", options: ["Chu nghia duy vat", "Chu nghia duy vat chat phac", "Chu nghia duy tam", "Chu nghia duy vat sieu hinh."], correct: 2 },
+      { id: 27, question: "Quan diem nao sau day thuoc chu nghia duy vat?", options: ["Vat chat co truoc, y thuc co sau; vat chat quyet dinh y thuc.", "Y thuc co truoc, vat chat co sau; y thuc quyet dinh vat chat.", "Vat chat va y thuc song song ton tai, khong cai nao phu thuoc cai nao.", "Y thuc la tinh thu nhat, vat chat la tinh thu hai."], correct: 0 },
+      { id: 28, question: "Triet hoc Mac - Lenin ra doi trong thoi gian nao?", options: ["Dau the ky XIX", "Nhung nam 40 cua the ky XIX", "Cuoi the ky XIX", "Dau the ky XX"], correct: 1 },
+      { id: 29, question: "Dau la tien de kinh te - xa hoi dua den hinh thanh triet hoc Mac - Lenin?", options: ["Su cung co va phat trien cua phuong thuc san xuat TBCN trong dieu kien cach mang cong nghiep", "Su phat trien cua vat ly hoc cuoi the ky XIX", "Su ra doi cua thuyet tien hoa", "Triet hoc co dien Duc"], correct: 0 },
+      { id: 30, question: "Tien de ly luan truc tiep cua triet hoc Mac la gi?", options: ["Triet hoc Hy Lap co dai", "Triet hoc co dien Duc", "Triet hoc Khai sang Phap", "Triet hoc duy vat Anh"], correct: 1 },
+      { id: 31, question: "C.Mac va Ph.Angghen da ke thua truc tiep tu tuong triet hoc cua ai?", options: ["Platon va Aristot", "Heghen va Phoiobac", "Canto va Hium", "Becon va Decacto"], correct: 1 },
+      { id: 32, question: "C.Mac va Ph.Angghen da ke thua hat nhan hop ly nao trong triet hoc Heghen?", options: ["Chu nghia duy vat", "Phep bien chung", "Chu nghia duy tam khach quan", "Y niem tuyet doi"], correct: 1 },
+      { id: 33, question: "C.Mac va Ph.Angghen da ke thua hat nhan hop ly nao trong triet hoc Phoiobac?", options: ["Phep bien chung", "Chu nghia duy vat", "Chu nghia duy tam", "Phuong phap sieu hinh"], correct: 1 },
+      { id: 34, question: "Dinh nghia vat chat cua V.I.Lenin ra doi trong hoan canh nao?", options: ["Khung hoang cua vat ly hoc cuoi the ky XIX, dau the ky XX", "Su phat trien cua sinh hoc", "Su ra doi cua thuyet tuong doi", "Cach mang cong nghiep lan thu nhat"], correct: 0 },
+      { id: 35, question: "Theo triet hoc Mac - Lenin, thuoc tinh co ban nhat cua vat chat la gi?", options: ["Co the can, do, dong, dem duoc", "Ton tai khach quan, doc lap voi y thuc", "Co the nhin thay, so mo duoc", "Ton tai vinh vien, khong sinh ra, khong mat di"], correct: 1 },
+      { id: 36, question: "Phuong thuc ton tai cua vat chat la gi?", options: ["Khong gian", "Thoi gian", "Van dong", "Dung im"], correct: 2 },
+      { id: 37, question: "Hinh thuc ton tai cua vat chat la gi?", options: ["Van dong va dung im", "Khong gian va thoi gian", "Van dong va khong gian", "Thoi gian va dung im"], correct: 1 },
+      { id: 38, question: "Theo triet hoc Mac - Lenin, co bao nhieu hinh thuc van dong co ban cua vat chat?", options: ["3 hinh thuc", "4 hinh thuc", "5 hinh thuc", "6 hinh thuc"], correct: 2 },
+      { id: 39, question: "Hinh thuc van dong nao la cao nhat, phuc tap nhat?", options: ["Van dong co hoc", "Van dong vat ly", "Van dong sinh hoc", "Van dong xa hoi"], correct: 3 },
+      { id: 40, question: "Nguon goc tu nhien cua y thuc la gi?", options: ["Lao dong va ngon ngu", "Bo nao nguoi va the gioi khach quan tac dong vao bo nao", "Hoat dong thuc tien cua con nguoi", "Su phat trien cua xa hoi"], correct: 1 },
+      { id: 41, question: "Nguon goc xa hoi cua y thuc la gi?", options: ["Bo nao nguoi", "The gioi khach quan", "Lao dong va ngon ngu", "Hoat dong phan anh"], correct: 2 },
+      { id: 42, question: "Ban chat cua y thuc la gi?", options: ["La su phan anh nang dong, sang tao the gioi khach quan vao bo nao nguoi", "La su phan anh thu dong the gioi khach quan", "La san pham cua bo nao nguoi", "La hinh anh chu quan cua the gioi khach quan"], correct: 0 },
+      { id: 43, question: "Theo triet hoc Mac - Lenin, moi quan he giua vat chat va y thuc nhu the nao?", options: ["Vat chat va y thuc ton tai doc lap voi nhau", "Y thuc quyet dinh vat chat", "Vat chat quyet dinh y thuc, y thuc co tinh doc lap tuong doi va tac dong tro lai vat chat", "Vat chat va y thuc quyet dinh lan nhau"], correct: 2 },
+      { id: 44, question: "Phep bien chung duy vat nghien cuu nhung quy luat chung nhat cua linh vuc nao?", options: ["Tu nhien", "Xa hoi", "Tu duy", "Tu nhien, xa hoi va tu duy"], correct: 3 },
+      { id: 45, question: "Nguyen ly ve moi lien he pho bien khang dinh dieu gi?", options: ["Cac su vat, hien tuong ton tai biet lap voi nhau", "Cac su vat, hien tuong ton tai trong moi lien he, tac dong qua lai, chuyen hoa lan nhau", "Chi co mot so su vat co moi lien he voi nhau", "Moi lien he giua cac su vat la ngau nhien"], correct: 1 },
+      { id: 46, question: "Nguyen ly ve su phat trien khang dinh dieu gi?", options: ["Moi su vat deu dung im, khong thay doi", "Phat trien la qua trinh van dong di len tu thap den cao, tu don gian den phuc tap", "Phat trien chi dien ra trong tu nhien", "Phat trien la qua trinh di xuong"], correct: 1 },
+      { id: 47, question: "Theo phep bien chung duy vat, co bao nhieu quy luat co ban?", options: ["2 quy luat", "3 quy luat", "4 quy luat", "5 quy luat"], correct: 1 },
+      { id: 48, question: "Quy luat nao vach ra nguon goc, dong luc cua su phat trien?", options: ["Quy luat luong - chat", "Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 1 },
+      { id: 49, question: "Quy luat nao vach ra cach thuc, hinh thuc cua su phat trien?", options: ["Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat chuyen hoa tu nhung thay doi ve luong thanh nhung thay doi ve chat va nguoc lai", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 1 },
+      { id: 50, question: "Quy luat nao vach ra khuynh huong cua su phat trien?", options: ["Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat luong - chat", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 2 },
+      { id: 51, question: "Mau thuan bien chung la gi?", options: ["Su xung dot, tranh cai giua cac quan diem", "Su thong nhat va dau tranh cua cac mat doi lap ben trong su vat", "Su khac biet giua cac su vat", "Su doi lap hoan toan giua cac su vat"], correct: 1 },
+      { id: 52, question: "Chat cua su vat la gi?", options: ["La nhung thuoc tinh von co cua su vat", "La tinh quy dinh khach quan von co cua su vat, la su thong nhat huu co cua nhung thuoc tinh cau thanh no", "La so luong cac yeu to cau thanh su vat", "La kich thuoc cua su vat"], correct: 1 },
+      { id: 53, question: "Luong cua su vat la gi?", options: ["La tinh quy dinh von co cua su vat ve mat so luong, quy mo, trinh do, nhip dieu", "La chat luong cua su vat", "La nhung thuoc tinh co ban cua su vat", "La ban chat cua su vat"], correct: 0 },
+      { id: 54, question: "Do la gi trong quy luat luong - chat?", options: ["La su thay doi ve chat", "La khoang gioi han ma trong do su thay doi ve luong chua lam thay doi can ban ve chat", "La su thay doi ve luong", "La diem nut cua su vat"], correct: 1 },
+      { id: 55, question: "Diem nut la gi trong quy luat luong - chat?", options: ["La khoang gioi han cua do", "La diem gioi han ma tai do su thay doi ve luong du de lam thay doi ve chat", "La su thay doi ve luong", "La su thay doi dan dan"], correct: 1 },
+      { id: 56, question: "Buoc nhay la gi?", options: ["La su thay doi dan dan ve luong", "La su chuyen hoa ve chat do nhung thay doi ve luong truoc do gay ra", "La su tich luy ve luong", "La khoang gioi han cua do"], correct: 1 },
+      { id: 57, question: "Phu dinh bien chung co dac diem gi?", options: ["Xoa bo hoan toan cai cu", "La su phu dinh co ke thua, tao dieu kien cho su phat trien", "La su phu dinh sach tron", "La su quay tro lai cai ban dau"], correct: 1 },
+      { id: 58, question: "Thuc tien la gi?", options: ["La hoat dong nhan thuc cua con nguoi", "La toan bo hoat dong vat chat co muc dich, mang tinh lich su - xa hoi cua con nguoi", "La hoat dong tu duy cua con nguoi", "La hoat dong tinh than cua con nguoi"], correct: 1 },
+      { id: 59, question: "Co bao nhieu hinh thuc co ban cua thuc tien?", options: ["2 hinh thuc", "3 hinh thuc", "4 hinh thuc", "5 hinh thuc"], correct: 1 },
+      { id: 60, question: "Hinh thuc co ban nhat cua thuc tien la gi?", options: ["Hoat dong chinh tri - xa hoi", "Hoat dong san xuat vat chat", "Hoat dong thuc nghiem khoa hoc", "Hoat dong giao duc"], correct: 1 },
+      { id: 61, question: "Vai tro cua thuc tien doi voi nhan thuc la gi?", options: ["La co so, dong luc, muc dich cua nhan thuc va la tieu chuan cua chan ly", "Chi la co so cua nhan thuc", "Chi la muc dich cua nhan thuc", "Khong co vai tro gi"], correct: 0 },
+      { id: 62, question: "Nhan thuc cam tinh bao gom nhung hinh thuc nao?", options: ["Khai niem, phan doan, suy luan", "Cam giac, tri giac, bieu tuong", "Phan tich, tong hop, so sanh", "Quy nap, dien dich, loai suy"], correct: 1 },
+      { id: 63, question: "Nhan thuc ly tinh bao gom nhung hinh thuc nao?", options: ["Cam giac, tri giac, bieu tuong", "Khai niem, phan doan, suy luan", "Phan tich, tong hop, so sanh", "Truc quan, tuong tuong, sang tao"], correct: 1 },
+      { id: 64, question: "Chan ly la gi?", options: ["La tri thuc phu hop voi thuc tien va duoc thuc tien kiem nghiem", "La quan diem cua so dong", "La nhung gi duoc moi nguoi thua nhan", "La nhung tri thuc moi"], correct: 0 },
+      { id: 65, question: "Tieu chuan cua chan ly la gi?", options: ["Ly luan", "Thuc tien", "Kinh nghiem", "Truyen thong"], correct: 1 },
+      { id: 66, question: "San xuat vat chat la gi?", options: ["La qua trinh lao dong co muc dich cua con nguoi", "La qua trinh con nguoi su dung cong cu lao dong tac dong vao tu nhien de tao ra cua cai vat chat", "La hoat dong kinh te cua con nguoi", "La qua trinh phan phoi san pham"], correct: 1 },
+      { id: 67, question: "Luc luong san xuat bao gom nhung yeu to nao?", options: ["Nguoi lao dong va quan he san xuat", "Nguoi lao dong va tu lieu san xuat", "Tu lieu san xuat va quan he san xuat", "Cong cu lao dong va doi tuong lao dong"], correct: 1 },
+      { id: 68, question: "Quan he san xuat bao gom nhung quan he nao?", options: ["Quan he so huu, quan he to chuc quan ly, quan he phan phoi", "Quan he giua nguoi voi tu nhien", "Quan he giua cac giai cap", "Quan he giua cac quoc gia"], correct: 0 },
+      { id: 69, question: "Quan he nao giu vai tro quyet dinh trong quan he san xuat?", options: ["Quan he to chuc quan ly", "Quan he phan phoi", "Quan he so huu tu lieu san xuat", "Quan he trao doi"], correct: 2 },
+      { id: 70, question: "Quy luat quan he san xuat phu hop voi trinh do phat trien cua luc luong san xuat the hien dieu gi?", options: ["Quan he san xuat quyet dinh luc luong san xuat", "Luc luong san xuat quyet dinh quan he san xuat, quan he san xuat tac dong tro lai luc luong san xuat", "Luc luong san xuat va quan he san xuat doc lap voi nhau", "Quan he san xuat khong anh huong den luc luong san xuat"], correct: 1 },
+      { id: 71, question: "Co so ha tang la gi?", options: ["La toan bo nhung quan he san xuat hop thanh co cau kinh te cua xa hoi", "La he thong duong sa, cau cong", "La cac cong trinh xay dung", "La cac co so vat chat ky thuat"], correct: 0 },
+      { id: 72, question: "Kien truc thuong tang la gi?", options: ["La cac cong trinh kien truc", "La toan bo nhung quan diem chinh tri, phap luat, triet hoc, dao duc, ton giao, nghe thuat... cung voi cac thiet che tuong ung", "La he thong nha nuoc", "La cac dang phai chinh tri"], correct: 1 },
+      { id: 73, question: "Moi quan he giua co so ha tang va kien truc thuong tang nhu the nao?", options: ["Kien truc thuong tang quyet dinh co so ha tang", "Co so ha tang quyet dinh kien truc thuong tang, kien truc thuong tang tac dong tro lai co so ha tang", "Co so ha tang va kien truc thuong tang doc lap voi nhau", "Khong co moi quan he giua chung"], correct: 1 },
+      { id: 74, question: "Ton tai xa hoi la gi?", options: ["La doi song tinh than cua xa hoi", "La doi song vat chat va nhung dieu kien sinh hoat vat chat cua xa hoi", "La y thuc xa hoi", "La cac quan he xa hoi"], correct: 1 },
+      { id: 75, question: "Y thuc xa hoi la gi?", options: ["La doi song vat chat cua xa hoi", "La mat tinh than cua doi song xa hoi, bao gom tu tuong, quan diem, tinh cam... cua cong dong xa hoi", "La ton tai xa hoi", "La co so ha tang"], correct: 1 },
+      { id: 76, question: "Moi quan he giua ton tai xa hoi va y thuc xa hoi nhu the nao?", options: ["Y thuc xa hoi quyet dinh ton tai xa hoi", "Ton tai xa hoi quyet dinh y thuc xa hoi, y thuc xa hoi co tinh doc lap tuong doi va tac dong tro lai ton tai xa hoi", "Ton tai xa hoi va y thuc xa hoi doc lap voi nhau", "Khong co moi quan he giua chung"], correct: 1 },
+      { id: 77, question: "Hinh thai kinh te - xa hoi la gi?", options: ["La mot kieu xa hoi", "La xa hoi o mot giai doan lich su nhat dinh voi mot kieu quan he san xuat dac trung phu hop voi trinh do nhat dinh cua luc luong san xuat", "La mot che do xa hoi", "La mot thoi ky lich su"], correct: 1 },
+      { id: 78, question: "Theo hoc thuyet hinh thai kinh te - xa hoi, lich su nhan loai da trai qua bao nhieu hinh thai?", options: ["3 hinh thai", "4 hinh thai", "5 hinh thai", "6 hinh thai"], correct: 2 },
+      { id: 79, question: "Giai cap la gi?", options: ["La nhung nhom nguoi khac nhau ve nghe nghiep", "La nhung tap doan nguoi khac nhau ve dia vi trong he thong san xuat xa hoi nhat dinh", "La nhung nhom nguoi khac nhau ve tuoi tac", "La nhung nhom nguoi khac nhau ve gioi tinh"], correct: 1 },
+      { id: 80, question: "Nguon goc cua giai cap la gi?", options: ["Do than linh quy dinh", "Do nguyen nhan kinh te - su phat trien cua luc luong san xuat dan den du thua san pham va che do tu huu", "Do su khac biet ve tri tue", "Do su khac biet ve the chat"], correct: 1 },
+      { id: 81, question: "Dau tranh giai cap la gi?", options: ["La xung dot giua cac ca nhan", "La cuoc dau tranh giua cac giai cap co loi ich doi lap nhau trong xa hoi co giai cap", "La chien tranh giua cac quoc gia", "La mau thuan giua cac dan toc"], correct: 1 },
+      { id: 82, question: "Vai tro cua dau tranh giai cap trong lich su la gi?", options: ["La dong luc truc tiep cua lich su trong xa hoi co giai cap", "Khong co vai tro gi", "Chi gay ra chien tranh", "Chi lam xa hoi thut lui"], correct: 0 },
+      { id: 83, question: "Cach mang xa hoi la gi?", options: ["La su thay doi ve van hoa", "La buoc nhay vot trong su phat trien cua xa hoi, la su thay the hinh thai kinh te - xa hoi nay bang hinh thai kinh te - xa hoi khac cao hon", "La su cai cach dan dan", "La su thay doi ve ky thuat"], correct: 1 },
+      { id: 84, question: "Nguyen nhan sau xa cua cach mang xa hoi la gi?", options: ["Do y muon chu quan cua lanh tu", "Do mau thuan giua luc luong san xuat va quan he san xuat", "Do chien tranh", "Do thien tai"], correct: 1 },
+      { id: 85, question: "Nha nuoc la gi?", options: ["La to chuc cua toan dan", "La bo may quyen luc dac biet cua giai cap thong tri de bao ve loi ich cua giai cap do", "La to chuc phi chinh tri", "La to chuc tu thien"], correct: 1 },
+      { id: 86, question: "Nguon goc cua nha nuoc theo quan diem mac-xit la gi?", options: ["Do than linh tao ra", "Nha nuoc ra doi khi xa hoi phan chia thanh giai cap va mau thuan giai cap gay gat khong the dieu hoa duoc", "Do khe uoc xa hoi", "Ton tai vinh vien cung voi xa hoi loai nguoi"], correct: 1 },
+      { id: 87, question: "Con nguoi la gi theo quan diem triet hoc Mac - Lenin?", options: ["Chi la thuc the tu nhien", "La thuc the sinh hoc - xa hoi, la san pham cua tu nhien va xa hoi", "Chi la thuc the xa hoi", "La san pham cua than linh"], correct: 1 },
+      { id: 88, question: "Ban chat con nguoi theo triet hoc Mac - Lenin la gi?", options: ["La tong hoa cac quan he xa hoi", "La ban nang sinh hoc", "La y thuc", "La linh hon"], correct: 0 },
+      { id: 89, question: "Quan chung nhan dan la gi?", options: ["Chi la giai cap cong nhan", "La nhung tap doan nguoi dong dao co chung loi ich, lien ket voi nhau thuc day su phat trien xa hoi", "Chi la nong dan", "Chi la tri thuc"], correct: 1 },
+      { id: 90, question: "Vai tro cua quan chung nhan dan trong lich su la gi?", options: ["Khong co vai tro gi", "La luc luong sang tao chan chinh ra lich su", "Chi la doi tuong bi boc lot", "Chi phuc tung lanh tu"], correct: 1 },
+      { id: 91, question: "Vai tro cua lanh tu trong lich su la gi?", options: ["Quyet dinh tat ca tien trinh lich su", "La nguoi nam bat quy luat, xu the phat trien, to chuc va lanh dao quan chung thuc hien nhiem vu lich su", "Khong co vai tro gi", "Chi dai dien cho loi ich ca nhan"], correct: 1 },
+      { id: 92, question: "Moi quan he giua lanh tu va quan chung nhan dan nhu the nao?", options: ["Lanh tu quyet dinh tat ca, quan chung chi phuc tung", "Lanh tu va quan chung nhan dan co quan he bien chung, gan bo mat thiet voi nhau", "Quan chung nhan dan khong can lanh tu", "Lanh tu va quan chung nhan dan doi lap nhau"], correct: 1 },
+      { id: 93, question: "Triet hoc Mac - Lenin co chuc nang gi?", options: ["Chi co chuc nang the gioi quan", "Chuc nang the gioi quan va phuong phap luan", "Chi co chuc nang phuong phap luan", "Khong co chuc nang nao"], correct: 1 },
+      { id: 94, question: "Phuong phap luan la gi?", options: ["La phuong phap cu the cua tung nganh khoa hoc", "La he thong nhung quan diem, nguyen tac chi dao hoat dong nhan thuc va thuc tien", "La cach thuc lam viec", "La ky thuat nghien cuu"], correct: 1 },
+      { id: 95, question: "Dac diem noi bat cua triet hoc Mac - Lenin la gi?", options: ["Tinh truu tuong", "Tinh thuc tien - cach mang va khoa hoc", "Tinh sieu hinh", "Tinh duy tam"], correct: 1 },
+      { id: 96, question: "V.I.Lenin da phat trien triet hoc Mac trong giai doan nao?", options: ["The ky XVIII", "Cuoi the ky XIX - dau the ky XX", "Giua the ky XIX", "The ky XXI"], correct: 1 },
+      { id: 97, question: "Tac pham 'Chu nghia duy vat va chu nghia kinh nghiem phe phan' cua Lenin viet ve van de gi?", options: ["Van de kinh te", "Van de triet hoc - bao ve va phat trien chu nghia duy vat bien chung", "Van de chinh tri", "Van de quan su"], correct: 1 },
+      { id: 98, question: "Nguyen tac khach quan trong nhan thuc va thuc tien doi hoi dieu gi?", options: ["Xuat phat tu y muon chu quan", "Xuat phat tu thuc te khach quan, ton trong quy luat khach quan", "Bo qua thuc te", "Dua vao cam tinh"], correct: 1 },
+      { id: 99, question: "Nguyen tac toan dien trong nhan thuc doi hoi dieu gi?", options: ["Chi xem xet mot mat cua su vat", "Xem xet su vat trong tat ca cac moi lien he cua no", "Bo qua cac moi lien he", "Chi quan tam den hien tai"], correct: 1 },
+      { id: 100, question: "Nguyen tac phat trien trong nhan thuc doi hoi dieu gi?", options: ["Xem xet su vat trong trang thai dung im", "Xem xet su vat trong su van dong, phat trien, trong qua khu, hien tai va tuong lai", "Chi quan tam den qua khu", "Phu nhan su phat trien"], correct: 1 },
+      { id: 101, question: "Nguyen tac lich su - cu the trong nhan thuc doi hoi dieu gi?", options: ["Ap dung may moc cac nguyen ly chung", "Xem xet su vat trong nhung dieu kien lich su cu the, trong khong gian va thoi gian xac dinh", "Bo qua hoan canh lich su", "Chi dua vao ly luan chung"], correct: 1 }
+    ];
+
+    // Game state
+    let gameState = {
+      screen: 'start', // start, playing, milestone, recovery, victory, defeat
+      path: null, // flora, fauna
+      questions: [],
+      questionIndex: 0,
+      health: 100,
+      errors: 0,
+      level: 1,
+      recoveryCount: 0,
+      selectedAnswer: null,
+      showFeedback: false,
+      lastCorrect: null,
+      hideUI: false
+    };
+
+    let p5Instance = null;
+
+    // Shuffle array
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[j], shuffled[i]] = [shuffled[i], shuffled[j]];
+      }
+      return shuffled;
+    }
+
+    // Initialize p5.js
+    function initP5() {
+      const sketch = (p) => {
+        let time = 0;
+
+        p.setup = () => {
+          const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
+          canvas.parent('canvas-container');
+          p.frameRate(30);
+          p.noStroke();
+        };
+
+        p.windowResized = () => {
+          p.resizeCanvas(window.innerWidth, window.innerHeight);
+        };
+
+        p.draw = () => {
+          time += 0.02;
+          const groundY = p.height * 0.67;
+          const centerX = p.width / 2;
+
+          // Sky
+          p.background(135, 206, 235);
+
+          // Ground (grass)
+          p.noStroke();
+          p.fill(34, 139, 34);
+          p.rect(0, groundY - 10, p.width, 20);
+
+          // Soil
+          p.fill(101, 67, 33);
+          p.rect(0, groundY + 10, p.width, p.height * 0.33);
+
+          // Top soil strip
+          p.fill(139, 90, 43);
+          p.rect(0, groundY + 10, p.width, 15);
+
+          // Sun
+          p.fill(255, 220, 100);
+          p.ellipse(p.width - 100, 80, 70, 70);
+          p.fill(255, 240, 150, 100);
+          p.ellipse(p.width - 100, 80, 90, 90);
+
+          // Clouds
+          p.fill(255, 255, 255, 200);
+          drawCloud(p, 100 + Math.sin(time * 0.3) * 20, 60);
+          drawCloud(p, 350 + Math.sin(time * 0.2) * 15, 100);
+          drawCloud(p, p.width - 250 + Math.sin(time * 0.25) * 18, 75);
+
+          // Draw entity if game is active
+          if (gameState.path && gameState.screen !== 'start') {
+            const progress = gameState.questionIndex;
+            const healthVal = gameState.health;
+            const isHealthy = healthVal > 50;
+            const currentLevel = gameState.level;
+
+            if (gameState.path === 'flora') {
+              drawFlora(p, centerX, groundY, progress, isHealthy, currentLevel, time, gameState.errors);
+            } else {
+              drawFauna(p, centerX, groundY, progress, isHealthy, currentLevel, time, gameState.errors);
+            }
+          }
+        };
+
+        function drawCloud(p, x, y) {
+          p.ellipse(x, y, 60, 40);
+          p.ellipse(x + 25, y - 10, 50, 35);
+          p.ellipse(x + 50, y, 55, 38);
+          p.ellipse(x + 25, y + 10, 45, 30);
+        }
+
+        function drawFlora(p, centerX, groundY, progress, isHealthy, level, time, errorCount) {
+          const windTime = time;
+
+          function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+          }
+
+          const treeDepth = Math.min(2 + Math.floor(progress / 5), level === 2 ? 10 : 7);
+          const maxDepth = level === 2 ? 10 : 7;
+
+          const showFlowers = progress >= 20;
+          const showFruits = progress >= 25;
+          const flowerCount = showFlowers ? Math.max(1, 5 - errorCount) : 0;
+          const fruitCount = showFruits ? Math.max(1, 9 - errorCount) : 0;
+
+          const branchTips = [];
+
+          function drawBranch(worldX, worldY, angle, len, depth, branchIndex, seedOffset) {
+            if (depth <= 0) return;
+
+            const windOffset = Math.sin(windTime + branchIndex * 0.5) * 0.05 * (maxDepth - depth + 1);
+            const currentAngle = angle + windOffset;
+
+            const endX = worldX + Math.sin(currentAngle) * len;
+            const endY = worldY - Math.cos(currentAngle) * len;
+
+            const thickness = 2 + ((depth - 1) / (maxDepth - 1)) * (level === 2 ? 25 : 18);
+
+            const brownVal = 60 + ((depth - 1) / (maxDepth - 1)) * 20;
+            p.stroke(brownVal + 20, brownVal - 10, brownVal - 30);
+            p.strokeWeight(thickness);
+            p.line(worldX, worldY, endX, endY);
+
+            if (depth <= 3) {
+              branchTips.push({ x: endX, y: endY, depth: depth });
+
+              const leafCount = Math.floor(15 - (depth - 1) * 3.3);
+              for (let i = 0; i < leafCount; i++) {
+                const seed = seedOffset + i * 100;
+                const leafAngle = (seededRandom(seed) - 0.5) * Math.PI + currentAngle;
+                const dist = 5 + seededRandom(seed + 1) * 25;
+                const leafX = endX + Math.cos(leafAngle) * dist;
+                const leafY = endY + Math.sin(leafAngle) * dist - 10;
+
+                const leafSway = Math.sin(windTime * 1.5 + seed) * 4;
+
+                p.push();
+                p.translate(leafX + leafSway, leafY);
+                p.rotate(leafAngle + Math.sin(windTime + seed) * 0.2);
+
+                const g = 100 + seededRandom(seed + 3) * 100;
+                p.fill(
+                  isHealthy ? 30 + seededRandom(seed + 4) * 50 : 130 + seededRandom(seed + 4) * 30,
+                  isHealthy ? g : 90 + seededRandom(seed + 3) * 50,
+                  isHealthy ? 30 + seededRandom(seed + 5) * 50 : 30,
+                  200
+                );
+                p.noStroke();
+                p.ellipse(0, 0, 4 + seededRandom(seed + 6) * 7, 6 + seededRandom(seed + 7) * 9);
+                p.pop();
+              }
+            }
+
+            if (depth > 1) {
+              const newLen = len * 0.72;
+              const angleSpread = Math.PI / 5;
+
+              const leftAngle = currentAngle - angleSpread + (seededRandom(seedOffset + 10) - 0.5) * 0.2;
+              drawBranch(endX, endY, leftAngle, newLen, depth - 1, branchIndex * 2, seedOffset + 1000);
+
+              const rightAngle = currentAngle + angleSpread + (seededRandom(seedOffset + 20) - 0.5) * 0.2;
+              drawBranch(endX, endY, rightAngle, newLen, depth - 1, branchIndex * 2 + 1, seedOffset + 2000);
+
+              if (depth > 3 && seededRandom(seedOffset + 30) > 0.5) {
+                const midAngle = currentAngle + (seededRandom(seedOffset + 31) - 0.5) * 0.3;
+                drawBranch(endX, endY, midAngle, newLen * 0.8, depth - 1, branchIndex * 3, seedOffset + 3000);
+              }
+            }
+          }
+
+          // Draw ground roots
+          p.stroke(101, 67, 33);
+          p.strokeWeight(level === 2 ? 6 : 3);
+          p.noFill();
+          for (let i = -2; i <= 2; i++) {
+            const rootX = centerX + i * (level === 2 ? 20 : 12);
+            const rootSway = Math.sin(windTime * 0.3 + i) * 2;
+            p.bezier(
+              rootX, groundY,
+              rootX + i * 10 + rootSway, groundY + 20,
+              rootX + i * 25 + rootSway, groundY + 35,
+              rootX + i * 40, groundY + 50 + Math.abs(i) * 10
+            );
+          }
+
+          const baseLen = Math.min(p.height * 0.15, level === 2 ? 140 : 100);
+          drawBranch(centerX, groundY, 0, baseLen, treeDepth, 0, 42);
+
+          // Draw flowers
+          if (showFlowers && branchTips.length > 0) {
+            p.noStroke();
+            for (let i = 0; i < Math.min(flowerCount, branchTips.length); i++) {
+              const tip = branchTips[i % branchTips.length];
+              const flowerSway = Math.sin(windTime * 2 + i) * 3;
+
+              p.push();
+              p.translate(tip.x + flowerSway, tip.y - 15);
+              p.rotate(windTime * 0.2 + i);
+
+              p.fill(255, 220, 50);
+              for (let j = 0; j < 5; j++) {
+                const petalAngle = (j / 5) * Math.PI * 2;
+                p.ellipse(Math.cos(petalAngle) * 8, Math.sin(petalAngle) * 8, 10, 10);
+              }
+              p.fill(255, 150, 50);
+              p.ellipse(0, 0, 8, 8);
+              p.pop();
+            }
+          }
+
+          // Draw fruits
+          if (showFruits && branchTips.length > 0) {
+            for (let i = 0; i < Math.min(fruitCount, branchTips.length); i++) {
+              const tip = branchTips[(i * 2 + flowerCount) % branchTips.length];
+              const fruitSway = Math.sin(windTime + i * 0.7) * 2;
+
+              p.push();
+              p.translate(tip.x + fruitSway, tip.y + 5);
+
+              p.stroke(100, 70, 40);
+              p.strokeWeight(2);
+              p.line(0, -10, 0, -2);
+
+              const ripeness = (progress - 25) / 20;
+              let r, g, b;
+              if (ripeness < 0.3) { r = 100; g = 180; b = 80; }
+              else if (ripeness < 0.7) { r = 255; g = 200; b = 50; }
+              else { r = 220; g = 50; b = 30; }
+
+              p.noStroke();
+              p.fill(r, g, b);
+              p.ellipse(0, 0, 18, 20);
+
+              p.fill(255, 255, 255, 80);
+              p.ellipse(-3, -4, 6, 6);
+
+              p.fill(60, 130, 60);
+              p.ellipse(0, -9, 10, 6);
+
+              p.pop();
+            }
+          }
+        }
+
+        function drawFauna(p, centerX, groundY, progress, isHealthy, level, time, errorCount) {
+          const breathe = Math.sin(time * 2) * 3;
+          const isWeak = !isHealthy;
+          const colorMult = isWeak ? 0.7 : 1;
+
+          if (level === 1) {
+            // CHICKEN lifecycle
+            if (progress < 5) {
+              // Egg stage
+              const wobble = Math.sin(time * 6) * (2 + progress);
+              const wobbleRotation = Math.sin(time * 6) * 0.1 * progress;
+
+              p.push();
+              p.translate(centerX, groundY - 30);
+              p.rotate(wobbleRotation);
+
+              p.fill(0, 0, 0, 30);
+              p.ellipse(wobble * 0.3, 25, 45, 12);
+
+              p.fill(255 * colorMult, 250 * colorMult, 240 * colorMult);
+              p.stroke(200, 190, 180);
+              p.strokeWeight(2);
+              p.ellipse(0, 0, 38, 50);
+              p.noStroke();
+
+              if (progress >= 2) {
+                p.stroke(120, 110, 100);
+                p.strokeWeight(2);
+                const crackProgress = (progress - 2) / 3;
+                p.line(-8, -5, -8 + 10 * crackProgress, 8 * crackProgress);
+                if (progress >= 3) {
+                  p.line(5, -10, 5 - 6 * crackProgress, -10 + 12 * crackProgress);
+                  p.line(-3, 5, -3 + 8 * crackProgress, 5 + 6 * crackProgress);
+                }
+                if (progress >= 4) {
+                  p.fill(255, 220, 50);
+                  p.noStroke();
+                  p.ellipse(6, -8, 8, 6);
+                }
+                p.noStroke();
+              }
+
+              p.pop();
+            } else if (progress < 15) {
+              // Chick stage
+              const chickSize = p.map(progress, 5, 15, 30, 60);
+              const hop = Math.abs(Math.sin(time * 4)) * 5;
+              const headBob = Math.sin(time * 3) * 3;
+              const wingFlutter = Math.sin(time * 8) * 5;
+
+              const bodyX = centerX;
+              const bodyY = groundY - chickSize * 0.5 - hop;
+
+              p.fill(0, 0, 0, 30);
+              p.ellipse(bodyX, groundY - 5, chickSize * 0.8, 12);
+
+              p.stroke(255 * colorMult, 180 * colorMult, 50);
+              p.strokeWeight(3);
+              const legSpread = Math.sin(time * 8) * 3;
+              p.line(bodyX - 8 - legSpread, bodyY + chickSize * 0.3, bodyX - 10, groundY);
+              p.line(bodyX + 8 + legSpread, bodyY + chickSize * 0.3, bodyX + 10, groundY);
+              p.line(bodyX - 15, groundY, bodyX - 5, groundY);
+              p.line(bodyX + 5, groundY, bodyX + 15, groundY);
+              p.noStroke();
+
+              p.fill(255 * colorMult, 220 * colorMult, 50);
+              p.ellipse(bodyX, bodyY, chickSize, chickSize * 0.8);
+
+              p.fill(255 * colorMult, 200 * colorMult, 30);
+              p.push();
+              p.translate(bodyX - chickSize * 0.3, bodyY);
+              p.rotate(-0.3 + wingFlutter * 0.02);
+              p.ellipse(0, 0, chickSize * 0.35, chickSize * 0.25);
+              p.pop();
+
+              p.push();
+              p.translate(bodyX + chickSize * 0.3, bodyY);
+              p.rotate(0.3 - wingFlutter * 0.02);
+              p.ellipse(0, 0, chickSize * 0.35, chickSize * 0.25);
+              p.pop();
+
+              const headX = bodyX;
+              const headY = bodyY - chickSize * 0.4 + headBob;
+              p.fill(255 * colorMult, 220 * colorMult, 50);
+              p.ellipse(headX, headY, chickSize * 0.55, chickSize * 0.5);
+
+              p.fill(255 * colorMult, 150 * colorMult, 50);
+              p.triangle(
+                headX + chickSize * 0.2, headY,
+                headX + chickSize * 0.4, headY + 3,
+                headX + chickSize * 0.2, headY + 6
+              );
+
+              const blink = Math.sin(time * 0.5) > 0.95;
+              p.fill(0);
+              if (blink) {
+                p.rect(headX + chickSize * 0.08 - 3, headY - 2, 6, 2);
+              } else {
+                p.ellipse(headX + chickSize * 0.08, headY - 2, 6, 6);
+                p.fill(255);
+                p.ellipse(headX + chickSize * 0.1, headY - 3, 2, 2);
+              }
+            } else {
+              // Adult hen
+              const henSize = p.map(progress, 15, 25, 70, 100);
+              const waddle = Math.sin(time * 3) * 0.05;
+              const headPeck = Math.sin(time * 2) * 8;
+              const tailWag = Math.sin(time * 4) * 0.1;
+              const wingRuffle = Math.sin(time * 6) * 3;
+
+              const bodyX = centerX;
+              const bodyY = groundY - henSize * 0.4 + breathe;
+
+              p.fill(0, 0, 0, 30);
+              p.ellipse(bodyX, groundY - 5, henSize * 1.2, 20);
+
+              p.push();
+              p.translate(bodyX, bodyY);
+              p.rotate(waddle);
+
+              p.push();
+              p.rotate(tailWag);
+              p.fill(100 * colorMult, 60 * colorMult, 30);
+              p.ellipse(-henSize * 0.55, -henSize * 0.1, 35, 50);
+              p.fill(80 * colorMult, 50 * colorMult, 25);
+              p.ellipse(-henSize * 0.5, -henSize * 0.2, 25, 40);
+              p.pop();
+
+              p.fill(180 * colorMult, 100 * colorMult, 50);
+              p.ellipse(0, 0, henSize, henSize * 0.65);
+
+              p.fill(160 * colorMult, 90 * colorMult, 45);
+              p.ellipse(-henSize * 0.05, wingRuffle * 0.3, henSize * 0.4, henSize * 0.35);
+
+              p.stroke(255 * colorMult, 180 * colorMult, 50);
+              p.strokeWeight(5);
+              p.line(-15, henSize * 0.28, -15, henSize * 0.28 + 40 - breathe);
+              p.line(15, henSize * 0.28, 15, henSize * 0.28 + 40 - breathe);
+              p.noStroke();
+
+              p.fill(255 * colorMult, 180 * colorMult, 50);
+              p.ellipse(-15, henSize * 0.28 + 42 - breathe, 20, 8);
+              p.ellipse(15, henSize * 0.28 + 42 - breathe, 20, 8);
+
+              p.pop();
+
+              const neckBaseX = bodyX + henSize * 0.35;
+              const neckBaseY = bodyY - henSize * 0.15;
+
+              p.push();
+              p.translate(neckBaseX, neckBaseY);
+
+              p.fill(180 * colorMult, 100 * colorMult, 50);
+              p.ellipse(henSize * 0.1, -henSize * 0.1, henSize * 0.25, henSize * 0.35);
+
+              const headX = henSize * 0.18 + headPeck * 0.1;
+              const headY = -henSize * 0.28 + Math.abs(headPeck) * 0.05;
+
+              p.fill(180 * colorMult, 100 * colorMult, 50);
+              p.ellipse(headX, headY, henSize * 0.38, henSize * 0.35);
+
+              p.fill(220 * colorMult, 50, 50);
+              p.beginShape();
+              p.vertex(headX - 8, headY - henSize * 0.15);
+              p.vertex(headX - 3, headY - henSize * 0.25);
+              p.vertex(headX + 3, headY - henSize * 0.15);
+              p.vertex(headX + 8, headY - henSize * 0.25);
+              p.vertex(headX + 12, headY - henSize * 0.12);
+              p.endShape(p.CLOSE);
+
+              p.ellipse(headX + 5, headY + henSize * 0.12, 10, 15);
+
+              p.fill(255 * colorMult, 180 * colorMult, 50);
+              p.triangle(
+                headX + henSize * 0.15, headY - 2,
+                headX + henSize * 0.28, headY + 3,
+                headX + henSize * 0.15, headY + 8
+              );
+
+              const blink = Math.sin(time * 0.7) > 0.92;
+              p.fill(0);
+              if (blink) {
+                p.rect(headX + 3, headY - 4, 7, 2);
+              } else {
+                p.ellipse(headX + 6, headY - 3, 7, 7);
+                p.fill(255);
+                p.ellipse(headX + 7, headY - 4, 2, 2);
+              }
+
+              p.pop();
+
+              // Eggs after Q20
+              if (progress >= 20) {
+                const eggCount = Math.max(1, 5 - errorCount);
+                for (let i = 0; i < eggCount; i++) {
+                  const eggX = centerX - 90 + i * 35;
+                  const eggWobble = Math.sin(time * 2 + i) * 1;
+
+                  p.fill(0, 0, 0, 20);
+                  p.ellipse(eggX, groundY - 3, 28, 8);
+
+                  p.fill(255 * colorMult, 250 * colorMult, 240 * colorMult);
+                  p.stroke(230, 220, 210);
+                  p.strokeWeight(1);
+                  p.ellipse(eggX + eggWobble, groundY - 16, 24, 30);
+                  p.noStroke();
+                }
+              }
+            }
+          } else {
+            // LEVEL 2: WATER BUFFALO
+            const buffaloSize = p.map(progress - 25, 0, 20, 100, 180);
+            const walkCycle = Math.sin(time * 2);
+            const breatheDeep = Math.sin(time * 1.5) * 5;
+            const tailSwing = Math.sin(time * 3) * 25;
+            const earFlick = Math.sin(time * 4) * 0.15;
+            const headNod = Math.sin(time * 1.2) * 3;
+
+            const bodyX = centerX;
+            const bodyY = groundY - buffaloSize * 0.4 + breatheDeep;
+
+            p.fill(0, 0, 0, 40);
+            p.ellipse(bodyX, groundY - 5, buffaloSize * 1.6, 30);
+
+            // Tail
+            p.stroke(30 * colorMult, 25 * colorMult, 20);
+            p.strokeWeight(6);
+            p.noFill();
+            p.bezier(
+              bodyX - buffaloSize * 0.7, bodyY,
+              bodyX - buffaloSize * 0.8, bodyY + 30,
+              bodyX - buffaloSize * 0.75 + tailSwing * 0.3, bodyY + 50,
+              bodyX - buffaloSize * 0.7 + tailSwing, bodyY + 70
+            );
+            p.fill(20, 15, 10);
+            p.noStroke();
+            p.ellipse(bodyX - buffaloSize * 0.7 + tailSwing, bodyY + 75, 18, 25);
+
+            // Legs
+            const legOffset = walkCycle * 8;
+            p.fill(40 * colorMult, 35 * colorMult, 30);
+            p.rect(bodyX - buffaloSize * 0.45, bodyY + buffaloSize * 0.25 - legOffset, 25, buffaloSize * 0.5, 5);
+            p.rect(bodyX - buffaloSize * 0.25, bodyY + buffaloSize * 0.25 + legOffset, 25, buffaloSize * 0.5, 5);
+            p.rect(bodyX + buffaloSize * 0.15, bodyY + buffaloSize * 0.25 + legOffset, 25, buffaloSize * 0.5, 5);
+            p.rect(bodyX + buffaloSize * 0.35, bodyY + buffaloSize * 0.25 - legOffset, 25, buffaloSize * 0.5, 5);
+
+            // Hooves
+            p.fill(20, 15, 10);
+            p.ellipse(bodyX - buffaloSize * 0.45 + 12, groundY, 28, 12);
+            p.ellipse(bodyX - buffaloSize * 0.25 + 12, groundY, 28, 12);
+            p.ellipse(bodyX + buffaloSize * 0.15 + 12, groundY, 28, 12);
+            p.ellipse(bodyX + buffaloSize * 0.35 + 12, groundY, 28, 12);
+
+            // Body
+            p.fill(50 * colorMult, 45 * colorMult, 40);
+            p.ellipse(bodyX, bodyY, buffaloSize * 1.4, buffaloSize * 0.75);
+
+            // Shoulder hump
+            p.ellipse(bodyX + buffaloSize * 0.2, bodyY - buffaloSize * 0.25, buffaloSize * 0.5, buffaloSize * 0.4);
+
+            // Neck
+            const neckX = bodyX + buffaloSize * 0.55;
+            const neckY = bodyY - buffaloSize * 0.1;
+            p.ellipse(neckX, neckY, buffaloSize * 0.35, buffaloSize * 0.5);
+
+            // Head
+            const headX = neckX + buffaloSize * 0.2;
+            const headY = neckY + headNod;
+
+            p.fill(50 * colorMult, 45 * colorMult, 40);
+            p.ellipse(headX, headY, buffaloSize * 0.45, buffaloSize * 0.38);
+
+            // Horns
+            p.stroke(70 * colorMult, 60 * colorMult, 50);
+            p.strokeWeight(8);
+            p.noFill();
+            p.arc(headX - 25, headY - buffaloSize * 0.2, 60, 40, p.PI, p.PI * 2);
+            p.arc(headX + 25, headY - buffaloSize * 0.2, 60, 40, p.PI, p.PI * 2);
+            p.noStroke();
+
+            // Ears
+            p.fill(50 * colorMult, 45 * colorMult, 40);
+            p.push();
+            p.translate(headX - 30, headY - 15);
+            p.rotate(-0.5 + earFlick);
+            p.ellipse(0, 0, 20, 35);
+            p.pop();
+
+            p.push();
+            p.translate(headX + 30, headY - 15);
+            p.rotate(0.5 - earFlick);
+            p.ellipse(0, 0, 20, 35);
+            p.pop();
+
+            // Muzzle
+            p.fill(60 * colorMult, 55 * colorMult, 50);
+            p.ellipse(headX + buffaloSize * 0.15, headY + buffaloSize * 0.08, 40, 30);
+
+            // Nostrils
+            p.fill(30, 25, 20);
+            p.ellipse(headX + buffaloSize * 0.12, headY + buffaloSize * 0.12, 10, 8);
+            p.ellipse(headX + buffaloSize * 0.2, headY + buffaloSize * 0.12, 10, 8);
+
+            // Eyes
+            const blink = Math.sin(time * 0.6) > 0.93;
+            p.fill(20, 15, 10);
+            if (blink) {
+              p.rect(headX - 8, headY - 8, 12, 3);
+              p.rect(headX + 20, headY - 8, 12, 3);
+            } else {
+              p.ellipse(headX - 2, headY - 5, 12, 12);
+              p.ellipse(headX + 26, headY - 5, 12, 12);
+              p.fill(255);
+              p.ellipse(headX, headY - 6, 4, 4);
+              p.ellipse(headX + 28, headY - 6, 4, 4);
+            }
+
+            // Calf after Q35
+            if (progress >= 35) {
+              const calfSize = 55;
+              const calfX = centerX - 130;
+              const calfY = groundY - calfSize * 0.35;
+              const calfHop = Math.abs(Math.sin(time * 3)) * 8;
+              const calfHeadTilt = Math.sin(time * 2) * 5;
+
+              p.fill(0, 0, 0, 25);
+              p.ellipse(calfX, groundY - 3, calfSize * 1.2, 15);
+
+              p.fill(60 * colorMult, 55 * colorMult, 50);
+              p.rect(calfX - 20, calfY - calfHop + 15, 10, 30, 3);
+              p.rect(calfX + 10, calfY - calfHop + 15, 10, 30, 3);
+
+              p.fill(60 * colorMult, 55 * colorMult, 50);
+              p.ellipse(calfX, calfY - calfHop, calfSize, calfSize * 0.55);
+
+              p.ellipse(calfX + calfSize * 0.35, calfY - calfHop - 5 + calfHeadTilt, calfSize * 0.35, calfSize * 0.3);
+
+              p.ellipse(calfX + calfSize * 0.25, calfY - calfHop - 18 + calfHeadTilt, 10, 18);
+              p.ellipse(calfX + calfSize * 0.45, calfY - calfHop - 18 + calfHeadTilt, 10, 18);
+
+              p.fill(20, 15, 10);
+              p.ellipse(calfX + calfSize * 0.4, calfY - calfHop - 6 + calfHeadTilt, 6, 6);
+            }
+          }
+        }
+
+        p.saveImage = () => {
+          p.saveCanvas('nong-trai-triet-hoc', 'png');
+        };
+      };
+
+      p5Instance = new p5(sketch);
+    }
+
+    // UI Functions
+    function showScreen(screenId) {
+      const screens = ['start-screen', 'milestone-screen', 'victory-screen', 'defeat-screen'];
+      screens.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      if (screenId) {
+        document.getElementById(screenId).classList.remove('hidden');
+      }
+    }
+
+    function updateHealthBar() {
+      document.getElementById('question-count').textContent = `Q${gameState.questionIndex + 1}/45`;
+      document.getElementById('health-percent').textContent = `${gameState.health}%`;
+      document.getElementById('error-count').textContent = gameState.errors;
+      
+      const fill = document.getElementById('health-fill');
+      fill.style.width = `${gameState.health}%`;
+      
+      if (gameState.health > 50) {
+        fill.style.background = '#22c55e';
+      } else if (gameState.health > 25) {
+        fill.style.background = '#eab308';
+      } else {
+        fill.style.background = '#ef4444';
+      }
+    }
+
+    function renderQuestion() {
+      const q = gameState.questions[gameState.questionIndex];
+      document.getElementById('question-text').textContent = q.question;
+      
+      const grid = document.getElementById('options-grid');
+      grid.innerHTML = '';
+      
+      q.options.forEach((option, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + idx)}.</span><span class="text">${option}</span>`;
+        btn.onclick = () => handleAnswer(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function updateRecoveryHeader() {
+      const remaining = 3 - gameState.recoveryCount;
+      document.getElementById('recovery-remaining').textContent = remaining;
+      
+      const dots = document.querySelectorAll('#recovery-dots .dot');
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('filled', i < gameState.recoveryCount);
+      });
+    }
+
+    // Game Functions
+    function startGame(selectedPath) {
+      gameState.path = selectedPath;
+      gameState.questions = shuffleArray(questions).slice(0, 45);
+      gameState.questionIndex = 0;
+      gameState.health = 100;
+      gameState.errors = 0;
+      gameState.level = 1;
+      gameState.recoveryCount = 0;
+      gameState.screen = 'playing';
+      gameState.hideUI = false;
+
+      showScreen(null);
+      document.getElementById('health-bar-container').classList.remove('hidden');
+      document.getElementById('question-panel').classList.remove('hidden');
+      document.getElementById('recovery-header').classList.add('hidden');
+      
+      updateHealthBar();
+      renderQuestion();
+    }
+
+    function handleAnswer(answerIndex) {
+      if (gameState.showFeedback) return;
+
+      gameState.selectedAnswer = answerIndex;
+      gameState.showFeedback = true;
+
+      const q = gameState.questions[gameState.questionIndex];
+      const isCorrect = answerIndex === q.correct;
+      gameState.lastCorrect = isCorrect;
+
+      // Update button styles
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correct) {
+          btn.classList.add('correct');
+        } else if (idx === answerIndex && !isCorrect) {
+          btn.classList.add('wrong');
+        } else {
+          btn.classList.add('dimmed');
+        }
+      });
+
+      // Show feedback
+      const feedback = document.getElementById('feedback');
+      feedback.classList.remove('hidden', 'correct', 'wrong');
+      feedback.classList.add(isCorrect ? 'correct' : 'wrong');
+      feedback.textContent = isCorrect 
+        ? (gameState.path === 'flora' ? 'Chinh xac! Cay dang lon len!' : 'Chinh xac! Sinh vat dang phat trien!')
+        : 'Sai roi! Hay co gang nhe!';
+
+      if (gameState.screen === 'recovery') {
+        if (isCorrect) {
+          gameState.recoveryCount++;
+          updateRecoveryHeader();
+          if (gameState.recoveryCount >= 3) {
+            gameState.health = 30;
+            gameState.screen = 'playing';
+            gameState.recoveryCount = 0;
+            document.getElementById('recovery-header').classList.add('hidden');
+          }
+        } else {
+          gameState.recoveryCount = 0;
+          updateRecoveryHeader();
+        }
+      } else {
+        if (!isCorrect) {
+          gameState.health = Math.max(0, gameState.health - 20);
+          gameState.errors++;
+          updateHealthBar();
+
+          if (gameState.health <= 0) {
+            setTimeout(() => {
+              gameState.screen = 'recovery';
+              gameState.recoveryCount = 0;
+              gameState.showFeedback = false;
+              gameState.selectedAnswer = null;
+              
+              document.getElementById('recovery-header').classList.remove('hidden');
+              updateRecoveryHeader();
+              renderQuestion();
+              document.getElementById('feedback').classList.add('hidden');
+            }, 1500);
+            return;
+          }
+        }
+      }
+
+      setTimeout(() => {
+        gameState.showFeedback = false;
+        gameState.selectedAnswer = null;
+        gameState.lastCorrect = null;
+        document.getElementById('feedback').classList.add('hidden');
+
+        const nextIndex = gameState.questionIndex + 1;
+
+        // Milestone at Q25
+        if (nextIndex === 25 && gameState.level === 1) {
+          gameState.questionIndex = 25;
+          gameState.screen = 'milestone';
+          
+          document.getElementById('health-bar-container').classList.add('hidden');
+          document.getElementById('question-panel').classList.add('hidden');
+          document.getElementById('milestone-hint').textContent = gameState.path === 'flora' 
+            ? 'Tien hoa thanh cay co thu (ca phe/nhan)'
+            : 'Tien hoa thanh trau nuoc';
+          showScreen('milestone-screen');
+          return;
+        }
+
+        // Victory at Q45
+        if (nextIndex >= 45) {
+          gameState.screen = 'victory';
+          
+          document.getElementById('health-bar-container').classList.add('hidden');
+          document.getElementById('question-panel').classList.add('hidden');
+          
+          let message = '';
+          if (gameState.path === 'flora') {
+            message = gameState.level === 2 
+              ? 'Cay co thu cua ban da phat trien hung vi!'
+              : 'Cay ca chua cua ban da ra qua!';
+          } else {
+            message = gameState.level === 2
+              ? 'Trau cua ban da truong thanh manh me!'
+              : 'Ga cua ban da de trung!';
+          }
+          document.getElementById('victory-message').textContent = message;
+          document.getElementById('victory-stats').textContent = `Hoan thanh voi ${gameState.errors} loi | Cap do ${gameState.level}`;
+          showScreen('victory-screen');
+          return;
+        }
+
+        gameState.questionIndex = nextIndex;
+        updateHealthBar();
+        renderQuestion();
+      }, 1500);
+    }
+
+    function handleMilestone(choice) {
+      if (choice === 'harvest') {
+        gameState.screen = 'victory';
+        
+        let message = gameState.path === 'flora' 
+          ? 'Cay ca chua cua ban da ra qua!'
+          : 'Ga cua ban da de trung!';
+        document.getElementById('victory-message').textContent = message;
+        document.getElementById('victory-stats').textContent = `Hoan thanh voi ${gameState.errors} loi | Cap do ${gameState.level}`;
+        showScreen('victory-screen');
+      } else {
+        gameState.level = 2;
+        gameState.screen = 'playing';
+        
+        showScreen(null);
+        document.getElementById('health-bar-container').classList.remove('hidden');
+        document.getElementById('question-panel').classList.remove('hidden');
+        renderQuestion();
+      }
+    }
+
+    function restartGame() {
+      window.location.reload();
+    }
+
+    function saveImage() {
+      if (p5Instance && p5Instance.saveImage) {
+        p5Instance.saveImage();
+      }
+    }
+
+    function viewResult() {
+      gameState.hideUI = true;
+      document.getElementById('ui-overlay').classList.add('hidden');
+      document.getElementById('back-btn-container').classList.remove('hidden');
+    }
+
+    function hideResult() {
+      gameState.hideUI = false;
+      document.getElementById('ui-overlay').classList.remove('hidden');
+      document.getElementById('back-btn-container').classList.add('hidden');
+    }
+
+    // Initialize
+    window.onload = () => {
+      initP5();
+    };
+  </script>
+</body>
+</html>
