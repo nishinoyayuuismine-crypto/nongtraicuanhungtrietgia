@@ -468,108 +468,373 @@
   <script>
     // Questions data
     const questions = [
-      { id: 1, question: "The gioi quan la gi?", options: ["Quan niem cua con nguoi ve the gioi", "Quan niem cua con nguoi ve tu nhien", "Quan niem cua con nguoi ve chinh con nguoi", "Quan niem cua con nguoi ve the gioi va ve vi tri cua con nguoi trong the gioi do"], correct: 3 },
-      { id: 2, question: "Chi ra cac hinh thuc the gioi quan trong lich su tu tuong?", options: ["The gioi quan duy vat; The gioi quan duy tam", "The gioi quan huyen thoai; The gioi quan ton giao", "The gioi quan ton giao; The gioi quan triet hoc", "The gioi quan huyen thoai; The gioi quan ton giao; The gioi quan triet hoc"], correct: 3 },
-      { id: 3, question: "Sap xep cac hinh thuc the gioi quan theo lich su phat trien cua tu tuong?", options: ["Than thoai; Ton giao; Triet hoc", "Ton giao; Triet hoc; Than thoai", "Triet hoc; Ton giao; Than thoai", "Than thoai; Triet hoc; Ton giao"], correct: 0 },
-      { id: 4, question: "Dau la nguon goc nhan thuc cua triet hoc?", options: ["Su phat trien cua san xuat", "Su phan cong lao dong xa hoi", "Xuat hien lao dong tri oc", "Nhan thuc cua con nguoi dat den trinh do tu duy truu tuong"], correct: 3 },
-      { id: 5, question: "Dau la nguon goc xa hoi cua triet hoc?", options: ["Nhan thuc cua con nguoi dat den trinh do tu duy truu tuong", "Su phat trien cua san xuat vat chat", "Xa hoi phan chia thanh giai cap", "Xa hoi phan chia thanh giai cap va xuat hien lao dong tri oc"], correct: 3 },
-      { id: 6, question: "Triet hoc ra doi vao thoi ky nao?", options: ["The ky VIII (TCN) den the ky VI (TCN)", "The ky VI (TCN) den the ky VIII (SCN)", "The ky VI (TCN) den the ky VI (SCN)", "The ky VIII (TCN) den the ky VIII (SCN)"], correct: 0 },
-      { id: 7, question: "Triet hoc ra doi som nhat o dau?", options: ["An do, Trung Quoc, Hy Lap", "An do, Ai Cap, Hy Lap", "An do, Trung Quoc, Ai Cap", "An do, Hy Lap, La Ma"], correct: 0 },
-      { id: 8, question: "Triet hoc ra doi trong che do nao?", options: ["Cong san nguyen thuy", "Chiem huu no le", "Phong kien", "Chu nghia tu ban"], correct: 1 },
-      { id: 9, question: "Talet quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 0 },
-      { id: 10, question: "Democrit quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 2 },
-      { id: 11, question: "Heraclit quan niem vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 1 },
-      { id: 12, question: "Anaximen quan niem, vat chat la:", options: ["Nuoc", "Lua", "Nguyen tu", "Khong khi"], correct: 3 },
-      { id: 13, question: "Hinh thuc dau tien cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 0 },
-      { id: 14, question: "Hinh thuc co ban thu hai cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 1 },
-      { id: 15, question: "Hinh thuc co ban thu ba cua chu nghia duy vat la gi?", options: ["Chu nghia duy vat chat phac", "Chu nghia duy vat sieu hinh", "Chu nghia duy vat bien chung", "Chu nghia duy vat cuc doan"], correct: 2 },
-      { id: 16, question: "Chu nghia duy vat bien chung do ai sang lap nen?", options: ["C.Mac", "Ph.Anghen", "C.Mac va Anghen", "C.Mac, Anghen va V.I.Lenin"], correct: 2 },
-      { id: 17, question: "Sai lam co ban cua CNDV truoc Mac ve vat chat la:", options: ["Cho rang vat chat duoc cau thanh tu lua.", "Cho rang nguyen tu cau thanh vat chat", "Cho rang nuoc la ban nguyen dau tien cua the gioi", "Dong nhat vat chat voi vat the"], correct: 3 },
-      { id: 18, question: "Theo Heghen, khoi nguyen cua the gioi la gi?", options: ["Ngu hanh", "Nguyen tu", "Y niem", "Y niem tuyet doi"], correct: 3 },
-      { id: 19, question: "Ai la ong to cua CNDT khach quan?", options: ["Platon", "Heghen", "Bekerley", "Phoiobac"], correct: 0 },
-      { id: 20, question: "Bekerley la nha triet hoc thuoc truong phai nao?", options: ["CNDV sieu hinh", "CNDV bien chung", "CNDT khach quan", "CNDT Chu quan"], correct: 3 },
-      { id: 21, question: "Platon, Heghen la nhung nha triet hoc thuoc truong phai nao?", options: ["CNDV sieu hinh", "CNDV bien chung", "CNDT khach quan", "CNDT Chu quan"], correct: 2 },
-      { id: 22, question: "Truong phai nao coi cac yeu to: Kim - Thuy - Moc - Hoa - Tho la khoi nguyen cua the gioi?", options: ["CNDV chat phac", "CNDV sieu hinh", "CNDV bien chung", "Khong co truong phai nao"], correct: 0 },
-      { id: 23, question: "Nha bac hoc nguoi Ba Lan - Nicolai Copecnic - da phat hien dieu gi lam thay doi the gioi quan thoi trung co?", options: ["Trai dat hinh cau", "Thuyet nhat tam", "Thuy trieu tac dong den toc do quay cua trai dat", "Trai dat duoc hinh thanh tu mot khoi tinh van nguyen thuy."], correct: 1 },
-      { id: 24, question: "Van de co ban cua triet hoc la gi?", options: ["Vat chat va y thuc", "Vai tro cua tu nhien doi voi con nguoi", "Moi quan he giua vat chat va y thuc", "Kha nang nhan thuc cua con nguoi."], correct: 2 },
-      { id: 25, question: "Quan diem nao sau day thuoc chu nghia duy tam?", options: ["Vat chat quyet dinh y thuc.", "Y thuc co truoc, vat chat co sau; y thuc quyet dinh vat chat.", "Y thuc tac dong tro lai vat chat", "Vat chat la tinh thu nhat, y thuc la tinh thu hai."], correct: 1 },
-      { id: 26, question: "Quan diem cho rang y thuc co truoc, vat chat co sau la quan diem cua:", options: ["Chu nghia duy vat", "Chu nghia duy vat chat phac", "Chu nghia duy tam", "Chu nghia duy vat sieu hinh."], correct: 2 },
-      { id: 27, question: "Quan diem nao sau day thuoc chu nghia duy vat?", options: ["Vat chat co truoc, y thuc co sau; vat chat quyet dinh y thuc.", "Y thuc co truoc, vat chat co sau; y thuc quyet dinh vat chat.", "Vat chat va y thuc song song ton tai, khong cai nao phu thuoc cai nao.", "Y thuc la tinh thu nhat, vat chat la tinh thu hai."], correct: 0 },
-      { id: 28, question: "Triet hoc Mac - Lenin ra doi trong thoi gian nao?", options: ["Dau the ky XIX", "Nhung nam 40 cua the ky XIX", "Cuoi the ky XIX", "Dau the ky XX"], correct: 1 },
-      { id: 29, question: "Dau la tien de kinh te - xa hoi dua den hinh thanh triet hoc Mac - Lenin?", options: ["Su cung co va phat trien cua phuong thuc san xuat TBCN trong dieu kien cach mang cong nghiep", "Su phat trien cua vat ly hoc cuoi the ky XIX", "Su ra doi cua thuyet tien hoa", "Triet hoc co dien Duc"], correct: 0 },
-      { id: 30, question: "Tien de ly luan truc tiep cua triet hoc Mac la gi?", options: ["Triet hoc Hy Lap co dai", "Triet hoc co dien Duc", "Triet hoc Khai sang Phap", "Triet hoc duy vat Anh"], correct: 1 },
-      { id: 31, question: "C.Mac va Ph.Angghen da ke thua truc tiep tu tuong triet hoc cua ai?", options: ["Platon va Aristot", "Heghen va Phoiobac", "Canto va Hium", "Becon va Decacto"], correct: 1 },
-      { id: 32, question: "C.Mac va Ph.Angghen da ke thua hat nhan hop ly nao trong triet hoc Heghen?", options: ["Chu nghia duy vat", "Phep bien chung", "Chu nghia duy tam khach quan", "Y niem tuyet doi"], correct: 1 },
-      { id: 33, question: "C.Mac va Ph.Angghen da ke thua hat nhan hop ly nao trong triet hoc Phoiobac?", options: ["Phep bien chung", "Chu nghia duy vat", "Chu nghia duy tam", "Phuong phap sieu hinh"], correct: 1 },
-      { id: 34, question: "Dinh nghia vat chat cua V.I.Lenin ra doi trong hoan canh nao?", options: ["Khung hoang cua vat ly hoc cuoi the ky XIX, dau the ky XX", "Su phat trien cua sinh hoc", "Su ra doi cua thuyet tuong doi", "Cach mang cong nghiep lan thu nhat"], correct: 0 },
-      { id: 35, question: "Theo triet hoc Mac - Lenin, thuoc tinh co ban nhat cua vat chat la gi?", options: ["Co the can, do, dong, dem duoc", "Ton tai khach quan, doc lap voi y thuc", "Co the nhin thay, so mo duoc", "Ton tai vinh vien, khong sinh ra, khong mat di"], correct: 1 },
-      { id: 36, question: "Phuong thuc ton tai cua vat chat la gi?", options: ["Khong gian", "Thoi gian", "Van dong", "Dung im"], correct: 2 },
-      { id: 37, question: "Hinh thuc ton tai cua vat chat la gi?", options: ["Van dong va dung im", "Khong gian va thoi gian", "Van dong va khong gian", "Thoi gian va dung im"], correct: 1 },
-      { id: 38, question: "Theo triet hoc Mac - Lenin, co bao nhieu hinh thuc van dong co ban cua vat chat?", options: ["3 hinh thuc", "4 hinh thuc", "5 hinh thuc", "6 hinh thuc"], correct: 2 },
-      { id: 39, question: "Hinh thuc van dong nao la cao nhat, phuc tap nhat?", options: ["Van dong co hoc", "Van dong vat ly", "Van dong sinh hoc", "Van dong xa hoi"], correct: 3 },
-      { id: 40, question: "Nguon goc tu nhien cua y thuc la gi?", options: ["Lao dong va ngon ngu", "Bo nao nguoi va the gioi khach quan tac dong vao bo nao", "Hoat dong thuc tien cua con nguoi", "Su phat trien cua xa hoi"], correct: 1 },
-      { id: 41, question: "Nguon goc xa hoi cua y thuc la gi?", options: ["Bo nao nguoi", "The gioi khach quan", "Lao dong va ngon ngu", "Hoat dong phan anh"], correct: 2 },
-      { id: 42, question: "Ban chat cua y thuc la gi?", options: ["La su phan anh nang dong, sang tao the gioi khach quan vao bo nao nguoi", "La su phan anh thu dong the gioi khach quan", "La san pham cua bo nao nguoi", "La hinh anh chu quan cua the gioi khach quan"], correct: 0 },
-      { id: 43, question: "Theo triet hoc Mac - Lenin, moi quan he giua vat chat va y thuc nhu the nao?", options: ["Vat chat va y thuc ton tai doc lap voi nhau", "Y thuc quyet dinh vat chat", "Vat chat quyet dinh y thuc, y thuc co tinh doc lap tuong doi va tac dong tro lai vat chat", "Vat chat va y thuc quyet dinh lan nhau"], correct: 2 },
-      { id: 44, question: "Phep bien chung duy vat nghien cuu nhung quy luat chung nhat cua linh vuc nao?", options: ["Tu nhien", "Xa hoi", "Tu duy", "Tu nhien, xa hoi va tu duy"], correct: 3 },
-      { id: 45, question: "Nguyen ly ve moi lien he pho bien khang dinh dieu gi?", options: ["Cac su vat, hien tuong ton tai biet lap voi nhau", "Cac su vat, hien tuong ton tai trong moi lien he, tac dong qua lai, chuyen hoa lan nhau", "Chi co mot so su vat co moi lien he voi nhau", "Moi lien he giua cac su vat la ngau nhien"], correct: 1 },
-      { id: 46, question: "Nguyen ly ve su phat trien khang dinh dieu gi?", options: ["Moi su vat deu dung im, khong thay doi", "Phat trien la qua trinh van dong di len tu thap den cao, tu don gian den phuc tap", "Phat trien chi dien ra trong tu nhien", "Phat trien la qua trinh di xuong"], correct: 1 },
-      { id: 47, question: "Theo phep bien chung duy vat, co bao nhieu quy luat co ban?", options: ["2 quy luat", "3 quy luat", "4 quy luat", "5 quy luat"], correct: 1 },
-      { id: 48, question: "Quy luat nao vach ra nguon goc, dong luc cua su phat trien?", options: ["Quy luat luong - chat", "Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 1 },
-      { id: 49, question: "Quy luat nao vach ra cach thuc, hinh thuc cua su phat trien?", options: ["Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat chuyen hoa tu nhung thay doi ve luong thanh nhung thay doi ve chat va nguoc lai", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 1 },
-      { id: 50, question: "Quy luat nao vach ra khuynh huong cua su phat trien?", options: ["Quy luat thong nhat va dau tranh cua cac mat doi lap", "Quy luat luong - chat", "Quy luat phu dinh cua phu dinh", "Quy luat nhan qua"], correct: 2 },
-      { id: 51, question: "Mau thuan bien chung la gi?", options: ["Su xung dot, tranh cai giua cac quan diem", "Su thong nhat va dau tranh cua cac mat doi lap ben trong su vat", "Su khac biet giua cac su vat", "Su doi lap hoan toan giua cac su vat"], correct: 1 },
-      { id: 52, question: "Chat cua su vat la gi?", options: ["La nhung thuoc tinh von co cua su vat", "La tinh quy dinh khach quan von co cua su vat, la su thong nhat huu co cua nhung thuoc tinh cau thanh no", "La so luong cac yeu to cau thanh su vat", "La kich thuoc cua su vat"], correct: 1 },
-      { id: 53, question: "Luong cua su vat la gi?", options: ["La tinh quy dinh von co cua su vat ve mat so luong, quy mo, trinh do, nhip dieu", "La chat luong cua su vat", "La nhung thuoc tinh co ban cua su vat", "La ban chat cua su vat"], correct: 0 },
-      { id: 54, question: "Do la gi trong quy luat luong - chat?", options: ["La su thay doi ve chat", "La khoang gioi han ma trong do su thay doi ve luong chua lam thay doi can ban ve chat", "La su thay doi ve luong", "La diem nut cua su vat"], correct: 1 },
-      { id: 55, question: "Diem nut la gi trong quy luat luong - chat?", options: ["La khoang gioi han cua do", "La diem gioi han ma tai do su thay doi ve luong du de lam thay doi ve chat", "La su thay doi ve luong", "La su thay doi dan dan"], correct: 1 },
-      { id: 56, question: "Buoc nhay la gi?", options: ["La su thay doi dan dan ve luong", "La su chuyen hoa ve chat do nhung thay doi ve luong truoc do gay ra", "La su tich luy ve luong", "La khoang gioi han cua do"], correct: 1 },
-      { id: 57, question: "Phu dinh bien chung co dac diem gi?", options: ["Xoa bo hoan toan cai cu", "La su phu dinh co ke thua, tao dieu kien cho su phat trien", "La su phu dinh sach tron", "La su quay tro lai cai ban dau"], correct: 1 },
-      { id: 58, question: "Thuc tien la gi?", options: ["La hoat dong nhan thuc cua con nguoi", "La toan bo hoat dong vat chat co muc dich, mang tinh lich su - xa hoi cua con nguoi", "La hoat dong tu duy cua con nguoi", "La hoat dong tinh than cua con nguoi"], correct: 1 },
-      { id: 59, question: "Co bao nhieu hinh thuc co ban cua thuc tien?", options: ["2 hinh thuc", "3 hinh thuc", "4 hinh thuc", "5 hinh thuc"], correct: 1 },
-      { id: 60, question: "Hinh thuc co ban nhat cua thuc tien la gi?", options: ["Hoat dong chinh tri - xa hoi", "Hoat dong san xuat vat chat", "Hoat dong thuc nghiem khoa hoc", "Hoat dong giao duc"], correct: 1 },
-      { id: 61, question: "Vai tro cua thuc tien doi voi nhan thuc la gi?", options: ["La co so, dong luc, muc dich cua nhan thuc va la tieu chuan cua chan ly", "Chi la co so cua nhan thuc", "Chi la muc dich cua nhan thuc", "Khong co vai tro gi"], correct: 0 },
-      { id: 62, question: "Nhan thuc cam tinh bao gom nhung hinh thuc nao?", options: ["Khai niem, phan doan, suy luan", "Cam giac, tri giac, bieu tuong", "Phan tich, tong hop, so sanh", "Quy nap, dien dich, loai suy"], correct: 1 },
-      { id: 63, question: "Nhan thuc ly tinh bao gom nhung hinh thuc nao?", options: ["Cam giac, tri giac, bieu tuong", "Khai niem, phan doan, suy luan", "Phan tich, tong hop, so sanh", "Truc quan, tuong tuong, sang tao"], correct: 1 },
-      { id: 64, question: "Chan ly la gi?", options: ["La tri thuc phu hop voi thuc tien va duoc thuc tien kiem nghiem", "La quan diem cua so dong", "La nhung gi duoc moi nguoi thua nhan", "La nhung tri thuc moi"], correct: 0 },
-      { id: 65, question: "Tieu chuan cua chan ly la gi?", options: ["Ly luan", "Thuc tien", "Kinh nghiem", "Truyen thong"], correct: 1 },
-      { id: 66, question: "San xuat vat chat la gi?", options: ["La qua trinh lao dong co muc dich cua con nguoi", "La qua trinh con nguoi su dung cong cu lao dong tac dong vao tu nhien de tao ra cua cai vat chat", "La hoat dong kinh te cua con nguoi", "La qua trinh phan phoi san pham"], correct: 1 },
-      { id: 67, question: "Luc luong san xuat bao gom nhung yeu to nao?", options: ["Nguoi lao dong va quan he san xuat", "Nguoi lao dong va tu lieu san xuat", "Tu lieu san xuat va quan he san xuat", "Cong cu lao dong va doi tuong lao dong"], correct: 1 },
-      { id: 68, question: "Quan he san xuat bao gom nhung quan he nao?", options: ["Quan he so huu, quan he to chuc quan ly, quan he phan phoi", "Quan he giua nguoi voi tu nhien", "Quan he giua cac giai cap", "Quan he giua cac quoc gia"], correct: 0 },
-      { id: 69, question: "Quan he nao giu vai tro quyet dinh trong quan he san xuat?", options: ["Quan he to chuc quan ly", "Quan he phan phoi", "Quan he so huu tu lieu san xuat", "Quan he trao doi"], correct: 2 },
-      { id: 70, question: "Quy luat quan he san xuat phu hop voi trinh do phat trien cua luc luong san xuat the hien dieu gi?", options: ["Quan he san xuat quyet dinh luc luong san xuat", "Luc luong san xuat quyet dinh quan he san xuat, quan he san xuat tac dong tro lai luc luong san xuat", "Luc luong san xuat va quan he san xuat doc lap voi nhau", "Quan he san xuat khong anh huong den luc luong san xuat"], correct: 1 },
-      { id: 71, question: "Co so ha tang la gi?", options: ["La toan bo nhung quan he san xuat hop thanh co cau kinh te cua xa hoi", "La he thong duong sa, cau cong", "La cac cong trinh xay dung", "La cac co so vat chat ky thuat"], correct: 0 },
-      { id: 72, question: "Kien truc thuong tang la gi?", options: ["La cac cong trinh kien truc", "La toan bo nhung quan diem chinh tri, phap luat, triet hoc, dao duc, ton giao, nghe thuat... cung voi cac thiet che tuong ung", "La he thong nha nuoc", "La cac dang phai chinh tri"], correct: 1 },
-      { id: 73, question: "Moi quan he giua co so ha tang va kien truc thuong tang nhu the nao?", options: ["Kien truc thuong tang quyet dinh co so ha tang", "Co so ha tang quyet dinh kien truc thuong tang, kien truc thuong tang tac dong tro lai co so ha tang", "Co so ha tang va kien truc thuong tang doc lap voi nhau", "Khong co moi quan he giua chung"], correct: 1 },
-      { id: 74, question: "Ton tai xa hoi la gi?", options: ["La doi song tinh than cua xa hoi", "La doi song vat chat va nhung dieu kien sinh hoat vat chat cua xa hoi", "La y thuc xa hoi", "La cac quan he xa hoi"], correct: 1 },
-      { id: 75, question: "Y thuc xa hoi la gi?", options: ["La doi song vat chat cua xa hoi", "La mat tinh than cua doi song xa hoi, bao gom tu tuong, quan diem, tinh cam... cua cong dong xa hoi", "La ton tai xa hoi", "La co so ha tang"], correct: 1 },
-      { id: 76, question: "Moi quan he giua ton tai xa hoi va y thuc xa hoi nhu the nao?", options: ["Y thuc xa hoi quyet dinh ton tai xa hoi", "Ton tai xa hoi quyet dinh y thuc xa hoi, y thuc xa hoi co tinh doc lap tuong doi va tac dong tro lai ton tai xa hoi", "Ton tai xa hoi va y thuc xa hoi doc lap voi nhau", "Khong co moi quan he giua chung"], correct: 1 },
-      { id: 77, question: "Hinh thai kinh te - xa hoi la gi?", options: ["La mot kieu xa hoi", "La xa hoi o mot giai doan lich su nhat dinh voi mot kieu quan he san xuat dac trung phu hop voi trinh do nhat dinh cua luc luong san xuat", "La mot che do xa hoi", "La mot thoi ky lich su"], correct: 1 },
-      { id: 78, question: "Theo hoc thuyet hinh thai kinh te - xa hoi, lich su nhan loai da trai qua bao nhieu hinh thai?", options: ["3 hinh thai", "4 hinh thai", "5 hinh thai", "6 hinh thai"], correct: 2 },
-      { id: 79, question: "Giai cap la gi?", options: ["La nhung nhom nguoi khac nhau ve nghe nghiep", "La nhung tap doan nguoi khac nhau ve dia vi trong he thong san xuat xa hoi nhat dinh", "La nhung nhom nguoi khac nhau ve tuoi tac", "La nhung nhom nguoi khac nhau ve gioi tinh"], correct: 1 },
-      { id: 80, question: "Nguon goc cua giai cap la gi?", options: ["Do than linh quy dinh", "Do nguyen nhan kinh te - su phat trien cua luc luong san xuat dan den du thua san pham va che do tu huu", "Do su khac biet ve tri tue", "Do su khac biet ve the chat"], correct: 1 },
-      { id: 81, question: "Dau tranh giai cap la gi?", options: ["La xung dot giua cac ca nhan", "La cuoc dau tranh giua cac giai cap co loi ich doi lap nhau trong xa hoi co giai cap", "La chien tranh giua cac quoc gia", "La mau thuan giua cac dan toc"], correct: 1 },
-      { id: 82, question: "Vai tro cua dau tranh giai cap trong lich su la gi?", options: ["La dong luc truc tiep cua lich su trong xa hoi co giai cap", "Khong co vai tro gi", "Chi gay ra chien tranh", "Chi lam xa hoi thut lui"], correct: 0 },
-      { id: 83, question: "Cach mang xa hoi la gi?", options: ["La su thay doi ve van hoa", "La buoc nhay vot trong su phat trien cua xa hoi, la su thay the hinh thai kinh te - xa hoi nay bang hinh thai kinh te - xa hoi khac cao hon", "La su cai cach dan dan", "La su thay doi ve ky thuat"], correct: 1 },
-      { id: 84, question: "Nguyen nhan sau xa cua cach mang xa hoi la gi?", options: ["Do y muon chu quan cua lanh tu", "Do mau thuan giua luc luong san xuat va quan he san xuat", "Do chien tranh", "Do thien tai"], correct: 1 },
-      { id: 85, question: "Nha nuoc la gi?", options: ["La to chuc cua toan dan", "La bo may quyen luc dac biet cua giai cap thong tri de bao ve loi ich cua giai cap do", "La to chuc phi chinh tri", "La to chuc tu thien"], correct: 1 },
-      { id: 86, question: "Nguon goc cua nha nuoc theo quan diem mac-xit la gi?", options: ["Do than linh tao ra", "Nha nuoc ra doi khi xa hoi phan chia thanh giai cap va mau thuan giai cap gay gat khong the dieu hoa duoc", "Do khe uoc xa hoi", "Ton tai vinh vien cung voi xa hoi loai nguoi"], correct: 1 },
-      { id: 87, question: "Con nguoi la gi theo quan diem triet hoc Mac - Lenin?", options: ["Chi la thuc the tu nhien", "La thuc the sinh hoc - xa hoi, la san pham cua tu nhien va xa hoi", "Chi la thuc the xa hoi", "La san pham cua than linh"], correct: 1 },
-      { id: 88, question: "Ban chat con nguoi theo triet hoc Mac - Lenin la gi?", options: ["La tong hoa cac quan he xa hoi", "La ban nang sinh hoc", "La y thuc", "La linh hon"], correct: 0 },
-      { id: 89, question: "Quan chung nhan dan la gi?", options: ["Chi la giai cap cong nhan", "La nhung tap doan nguoi dong dao co chung loi ich, lien ket voi nhau thuc day su phat trien xa hoi", "Chi la nong dan", "Chi la tri thuc"], correct: 1 },
-      { id: 90, question: "Vai tro cua quan chung nhan dan trong lich su la gi?", options: ["Khong co vai tro gi", "La luc luong sang tao chan chinh ra lich su", "Chi la doi tuong bi boc lot", "Chi phuc tung lanh tu"], correct: 1 },
-      { id: 91, question: "Vai tro cua lanh tu trong lich su la gi?", options: ["Quyet dinh tat ca tien trinh lich su", "La nguoi nam bat quy luat, xu the phat trien, to chuc va lanh dao quan chung thuc hien nhiem vu lich su", "Khong co vai tro gi", "Chi dai dien cho loi ich ca nhan"], correct: 1 },
-      { id: 92, question: "Moi quan he giua lanh tu va quan chung nhan dan nhu the nao?", options: ["Lanh tu quyet dinh tat ca, quan chung chi phuc tung", "Lanh tu va quan chung nhan dan co quan he bien chung, gan bo mat thiet voi nhau", "Quan chung nhan dan khong can lanh tu", "Lanh tu va quan chung nhan dan doi lap nhau"], correct: 1 },
-      { id: 93, question: "Triet hoc Mac - Lenin co chuc nang gi?", options: ["Chi co chuc nang the gioi quan", "Chuc nang the gioi quan va phuong phap luan", "Chi co chuc nang phuong phap luan", "Khong co chuc nang nao"], correct: 1 },
-      { id: 94, question: "Phuong phap luan la gi?", options: ["La phuong phap cu the cua tung nganh khoa hoc", "La he thong nhung quan diem, nguyen tac chi dao hoat dong nhan thuc va thuc tien", "La cach thuc lam viec", "La ky thuat nghien cuu"], correct: 1 },
-      { id: 95, question: "Dac diem noi bat cua triet hoc Mac - Lenin la gi?", options: ["Tinh truu tuong", "Tinh thuc tien - cach mang va khoa hoc", "Tinh sieu hinh", "Tinh duy tam"], correct: 1 },
-      { id: 96, question: "V.I.Lenin da phat trien triet hoc Mac trong giai doan nao?", options: ["The ky XVIII", "Cuoi the ky XIX - dau the ky XX", "Giua the ky XIX", "The ky XXI"], correct: 1 },
-      { id: 97, question: "Tac pham 'Chu nghia duy vat va chu nghia kinh nghiem phe phan' cua Lenin viet ve van de gi?", options: ["Van de kinh te", "Van de triet hoc - bao ve va phat trien chu nghia duy vat bien chung", "Van de chinh tri", "Van de quan su"], correct: 1 },
-      { id: 98, question: "Nguyen tac khach quan trong nhan thuc va thuc tien doi hoi dieu gi?", options: ["Xuat phat tu y muon chu quan", "Xuat phat tu thuc te khach quan, ton trong quy luat khach quan", "Bo qua thuc te", "Dua vao cam tinh"], correct: 1 },
-      { id: 99, question: "Nguyen tac toan dien trong nhan thuc doi hoi dieu gi?", options: ["Chi xem xet mot mat cua su vat", "Xem xet su vat trong tat ca cac moi lien he cua no", "Bo qua cac moi lien he", "Chi quan tam den hien tai"], correct: 1 },
-      { id: 100, question: "Nguyen tac phat trien trong nhan thuc doi hoi dieu gi?", options: ["Xem xet su vat trong trang thai dung im", "Xem xet su vat trong su van dong, phat trien, trong qua khu, hien tai va tuong lai", "Chi quan tam den qua khu", "Phu nhan su phat trien"], correct: 1 },
-      { id: 101, question: "Nguyen tac lich su - cu the trong nhan thuc doi hoi dieu gi?", options: ["Ap dung may moc cac nguyen ly chung", "Xem xet su vat trong nhung dieu kien lich su cu the, trong khong gian va thoi gian xac dinh", "Bo qua hoan canh lich su", "Chi dua vao ly luan chung"], correct: 1 }
-    ];
+  {const questions = [
+  {
+    question: "Triết học ra đời từ nguồn gốc nào?",
+    options: ["Nguồn gốc nhận thức và nguồn gốc xã hội", "Nguồn gốc tự nhiên", "Nguồn gốc tâm lý", "Nguồn gốc thần thoại"],
+    correct: 0
+  },
+  {
+    question: "Vấn đề cơ bản của triết học là gì?",
+    options: ["Mối quan hệ giữa vật chất và ý thức", "Vấn đề con người", "Vấn đề xã hội", "Vấn đề tự nhiên"],
+    correct: 0
+  },
+  {
+    question: "Thế giới quan là gì?",
+    options: ["Hệ thống quan điểm về thế giới và vị trí con người", "Cách nhìn cuộc sống", "Sự hiểu biết khoa học", "Niềm tin tôn giáo"],
+    correct: 0
+  },
+  {
+    question: "Đối tượng của Triết học Mác-Lênin là gì?",
+    options: ["Quy luật chung nhất của tự nhiên, xã hội và tư duy", "Quy luật vật lý", "Quy luật kinh tế", "Quy luật tâm lý"],
+    correct: 0
+  },
+  {
+    question: "Vật chất là một phạm trù triết học dùng để chỉ thực tại khách quan - Đây là định nghĩa của ai?",
+    options: ["V.I. Lênin", "C. Mác", "Ph. Ăngghen", "Hêghen"],
+    correct: 0
+  },
+  {
+    question: "Hình thức vận động nào là cao nhất?",
+    options: ["Vận động xã hội", "Vận động sinh học", "Vận động cơ giới", "Vận động hóa học"],
+    correct: 0
+  },
+  {
+    question: "Nguồn gốc xã hội của ý thức là gì?",
+    options: ["Lao động và ngôn ngữ", "Bộ óc người", "Thế giới khách quan", "Sự phản ánh"],
+    correct: 0
+  },
+  {
+    question: "Quy luật nào vạch ra phương thức của sự phát triển?",
+    options: ["Quy luật lượng - chất", "Quy luật mâu thuẫn", "Quy luật phủ định", "Quy luật nhân quả"],
+    correct: 0
+  },
+  {
+    question: "Quy luật nào là hạt nhân của phép biện chứng?",
+    options: ["Quy luật mâu thuẫn", "Quy luật lượng chất", "Quy luật phủ định", "Quy luật mâu thuẫn xã hội"],
+    correct: 0
+  },
+  {
+    question: "Thực tiễn là gì?",
+    options: ["Hoạt động vật chất - cảm tính có mục đích", "Mọi suy nghĩ của con người", "Hoạt động thí nghiệm", "Sự quan sát"],
+    correct: 0
+  },
+  {
+    question: "Phép biện chứng duy vật có mấy nguyên lý cơ bản?",
+    options: ["2 nguyên lý", "3 nguyên lý", "4 nguyên lý", "6 nguyên lý"],
+    correct: 0
+  },
+  {
+    question: "Mối liên hệ phổ biến có tính chất gì?",
+    options: ["Tính khách quan, phổ biến, đa dạng", "Tính chủ quan", "Tính nhất thời", "Tính đơn nhất"],
+    correct: 0
+  },
+  {
+    question: "Cơ sở của mối liên hệ phổ biến là gì?",
+    options: ["Tính thống nhất vật chất của thế giới", "Ý muốn con người", "Sự sắp đặt của thần linh", "Tính ngẫu nhiên"],
+    correct: 0
+  },
+  {
+    question: "Phát triển là gì?",
+    options: ["Sự vận động đi lên từ thấp đến cao", "Sự thay đổi vị trí", "Sự lặp lại cái cũ", "Sự đứng yên"],
+    correct: 0
+  },
+  {
+    question: "Cái riêng là phạm trù dùng để chỉ cái gì?",
+    options: ["Một sự vật, hiện tượng nhất định", "Các mặt giống nhau", "Các đặc điểm lặp lại", "Tổng thể thế giới"],
+    correct: 0
+  },
+  {
+    question: "Cái chung tồn tại ở đâu?",
+    options: ["Trong cái riêng", "Ngoài cái riêng", "Độc lập với cái riêng", "Trong tư duy con người"],
+    correct: 0
+  },
+  {
+    question: "Nguyên nhân là gì?",
+    options: ["Sự tác động gây ra sự biến đổi", "Sự kiện xảy ra trước", "Sự kiện xảy ra sau", "Sự trùng hợp"],
+    correct: 0
+  },
+  {
+    question: "Tất nhiên là cái gì?",
+    options: ["Bắt nguồn từ bản chất bên trong", "Do yếu tố bên ngoài", "Sự may mắn", "Không thể dự báo"],
+    correct: 0
+  },
+  {
+    question: "Nội dung là gì?",
+    options: ["Tổng hợp tất cả những mặt, những yếu tố tạo nên sự vật", "Hình thức bên ngoài", "Vẻ bề ngoài", "Cách sắp xếp"],
+    correct: 0
+  },
+  {
+    question: "Chất là phạm trù dùng để chỉ cái gì?",
+    options: ["Tính quy định khách quan vốn có", "Số lượng các mặt", "Trọng lượng sự vật", "Màu sắc hiện tượng"],
+    correct: 0
+  },
+  {
+    question: "Lượng là phạm trù chỉ cái gì?",
+    options: ["Quy mô, trình độ, số lượng", "Bản chất sự vật", "Cấu trúc bên trong", "Tính chất ổn định"],
+    correct: 0
+  },
+  {
+    question: "Độ là gì?",
+    options: ["Giới hạn mà sự thay đổi về lượng chưa làm thay đổi về chất", "Điểm xảy ra bước nhảy", "Sự thay đổi hoàn toàn", "Sự đứng yên"],
+    correct: 0
+  },
+  {
+    question: "Mâu thuẫn là gì?",
+    options: ["Sự thống nhất và đấu tranh của các mặt đối lập", "Sự cãi nhau", "Sự khác biệt hoàn toàn", "Sự giống nhau"],
+    correct: 0
+  },
+  {
+    question: "Phủ định biện chứng là gì?",
+    options: ["Tự phủ định, có tính kế thừa", "Xóa bỏ hoàn toàn cái cũ", "Sự tác động từ bên ngoài", "Sự phá hủy"],
+    correct: 0
+  },
+  {
+    question: "Nhận thức là quá trình gì?",
+    options: ["Phản ánh năng động, sáng tạo thực tại", "Sự sao chép máy móc", "Sự tưởng tượng", "Bản năng của con người"],
+    correct: 0
+  },
+  {
+    question: "Nhận thức cảm tính gồm những hình thức nào?",
+    options: ["Cảm giác, tri giác, biểu tượng", "Khái niệm, phán đoán", "Suy luận", "Lý thuyết"],
+    correct: 0
+  },
+  {
+    question: "Nhận thức lý tính gồm những hình thức nào?",
+    options: ["Khái niệm, phán đoán, suy luận", "Cảm giác, tri giác", "Biểu tượng", "Hình ảnh"],
+    correct: 0
+  },
+  {
+    question: "Chân lý là gì?",
+    options: ["Tri thức phù hợp với thực tế", "Điều mọi người tin theo", "Lời nói của người giàu", "Sự tưởng tượng"],
+    correct: 0
+  },
+  {
+    question: "Lực lượng sản xuất gồm những yếu tố nào?",
+    options: ["Người lao động và tư liệu sản xuất", "Máy móc và nhà xưởng", "Tiền vốn", "Công nghệ"],
+    correct: 0
+  },
+  {
+    question: "Quan hệ sản xuất gồm những mặt nào?",
+    options: ["Sở hữu, tổ chức, phân phối", "Mua bán, trao đổi", "Vay vốn", "Tiêu dùng"],
+    correct: 0
+  }
+  {
+    question: "Tồn tại xã hội bao gồm những yếu tố nào?",
+    options: ["Phương thức sản xuất, điều kiện tự nhiên, dân cư", "Văn hóa, nghệ thuật", "Pháp luật và tôn giáo", "Chính trị và đạo đức"],
+    correct: 0
+  },
+  {
+    question: "Yếu tố nào trong tồn tại xã hội đóng vai trò quyết định nhất?",
+    options: ["Phương thức sản xuất", "Điều kiện tự nhiên", "Mật độ dân cư", "Địa hình địa lý"],
+    correct: 0
+  },
+  {
+    question: "Ý thức xã hội là gì?",
+    options: ["Mặt tinh thần của đời sống xã hội", "Toàn bộ các quy định pháp luật", "Các hoạt động vui chơi giải trí", "Nhu cầu ăn mặc của con người"],
+    correct: 0
+  },
+  {
+    question: "Mối quan hệ giữa tồn tại xã hội và ý thức xã hội là gì?",
+    options: ["Tồn tại xã hội quyết định ý thức xã hội", "Ý thức xã hội quyết định tồn tại xã hội", "Hai yếu tố hoàn toàn độc lập", "Ý thức xã hội luôn lạc hậu hơn"],
+    correct: 0
+  },
+  {
+    question: "Hình thái kinh tế - xã hội bao gồm những yếu tố nào?",
+    options: ["Lực lượng sản xuất, quan hệ sản xuất, kiến trúc thượng tầng", "Công cụ lao động và đất đai", "Nhà nước và các đảng phái", "Văn hóa và ý thức"],
+    correct: 0
+  },
+  {
+    question: "Tiến trình lịch sử - tự nhiên của xã hội loài người là gì?",
+    options: ["Sự thay thế các hình thái kinh tế - xã hội từ thấp đến cao", "Sự thay đổi của khí hậu", "Sự tiến hóa của các loài sinh vật", "Sự di cư của các bộ tộc"],
+    correct: 0
+  },
+  {
+    question: "Giai cấp là gì?",
+    options: ["Những tập đoàn người có địa vị khác nhau trong hệ thống sản xuất", "Những người có cùng sở thích", "Những người cùng độ tuổi", "Những người cùng tôn giáo"],
+    correct: 0
+  },
+  {
+    question: "Nguồn gốc trực tiếp dẫn đến sự ra đời của giai cấp là gì?",
+    options: ["Chế độ tư hữu về tư liệu sản xuất", "Sự phân công lao động", "Chiến tranh giữa các bộ lạc", "Sự khác biệt về trình độ"],
+    correct: 0
+  },
+  {
+    question: "Đấu tranh giai cấp là gì?",
+    options: ["Cuộc đấu tranh giữa các giai cấp có lợi ích đối lập nhau", "Sự tranh luận về lý thuyết", "Cuộc cạnh tranh trong kinh doanh", "Sự mâu thuẫn trong gia đình"],
+    correct: 0
+  },
+  {
+    question: "Nhà nước ra đời từ khi nào?",
+    options: ["Khi mâu thuẫn giai cấp không thể điều hòa được", "Ngay từ thời kỳ nguyên thủy", "Khi con người biết làm nông nghiệp", "Khi có sự xuất hiện của tôn giáo"],
+    correct: 0
+  },
+  {
+    question: "Bản chất của nhà nước là gì?",
+    options: ["Công cụ thống trị của giai cấp này đối với giai cấp khác", "Tổ chức bảo vệ tất cả mọi người", "Một tổ chức thiện nguyện", "Cơ quan nghiên cứu khoa học"],
+    correct: 0
+  },
+  {
+    question: "Cách mạng xã hội là gì?",
+    options: ["Sự thay đổi căn bản về chất của một chế độ xã hội", "Sự thay đổi một số người đứng đầu nhà nước", "Cuộc cải cách hành chính", "Sự thay đổi về kỹ thuật sản xuất"],
+    current: 0
+  },
+  {
+    question: "Nguyên nhân sâu xa của cách mạng xã hội là gì?",
+    options: ["Mâu thuẫn giữa lực lượng sản xuất và quan hệ sản xuất", "Do mong muốn của các nhà lãnh đạo", "Do tác động của các yếu tố bên ngoài", "Do thiên tai và dịch bệnh"],
+    correct: 0
+  },
+  {
+    question: "Ý thức cá nhân và ý thức xã hội quan hệ như thế nào?",
+    options: ["Ý thức xã hội tồn tại thông qua ý thức cá nhân", "Ý thức cá nhân hoàn toàn khác ý thức xã hội", "Ý thức xã hội lớn hơn ý thức cá nhân", "Hai khái niệm không liên quan"],
+    correct: 0
+  },
+  {
+    question: "Khoa học trở thành lực lượng sản xuất trực tiếp từ khi nào?",
+    options: ["Từ cuộc cách mạng khoa học kỹ thuật hiện đại", "Từ thời cổ đại", "Từ thời phong kiến", "Từ thế kỷ XVIII"],
+    correct: 0
+  },
+  {
+    question: "Công cụ lao động là yếu tố như thế nào trong lực lượng sản xuất?",
+    options: ["Yếu tố động nhất, cách mạng nhất", "Yếu tố đứng yên nhất", "Yếu tố không quan trọng", "Yếu tố mang tính tinh thần"],
+    correct: 0
+  },
+  {
+    question: "Kiến trúc thượng tầng bao gồm yếu tố nào?",
+    options: ["Các hình thái ý thức xã hội và các thiết chế tương ứng", "Máy móc và nhà xưởng", "Nguyên liệu sản xuất", "Kỹ thuật canh tác"],
+    correct: 0
+  },
+  {
+    question: "Quan hệ sản xuất đóng vai trò gì đối với lực lượng sản xuất?",
+    options: ["Tác động trở lại (thúc đẩy hoặc kìm hãm) lực lượng sản xuất", "Quyết định sự tồn tại của lực lượng sản xuất", "Không có tác động gì", "Thay thế lực lượng sản xuất"],
+    correct: 0
+  },
+  {
+    question: "Tính độc lập tương đối của ý thức xã hội thể hiện ở điểm nào?",
+    options: ["Ý thức xã hội có thể vượt trước tồn tại xã hội", "Ý thức xã hội luôn đi sau tồn tại xã hội", "Ý thức xã hội không phụ thuộc vào con người", "Ý thức xã hội là bất biến"],
+    correct: 0
+  },
+  {
+    question: "Sự phản ánh của ý thức đối với vật chất là sự phản ánh như thế nào?",
+    options: ["Phản ánh năng động, sáng tạo", "Phản ánh như cái gương chụp ảnh", "Phản ánh máy móc", "Phản ánh thụ động"],
+    correct: 0
+  },
+  {
+    question: "Yếu tố nào đóng vai trò là phương thức tồn tại của vật chất?",
+    options: ["Vận động", "Đứng yên", "Trọng lượng", "Màu sắc"],
+    correct: 0
+  },
+  {
+    question: "Phép biện chứng duy vật là gì?",
+    options: ["Khoa học về những mối liên hệ phổ biến và sự phát triển", "Nghệ thuật tranh luận", "Lý thuyết về sự tĩnh tại", "Phương pháp quan sát thực địa"],
+    correct: 0
+  },
+  {
+    question: "Mối quan hệ biện chứng là gì?",
+    options: ["Sự tác động qua lại, quy định và chuyển hóa lẫn nhau", "Sự xếp cạnh nhau của các sự vật", "Sự tách rời nhau", "Sự trùng khớp hoàn toàn"],
+    correct: 0
+  },
+  {
+    question: "Phát triển là một trường hợp đặc biệt của cái gì?",
+    options: ["Vận động", "Đứng yên", "Thoái hóa", "Lặp lại"],
+    correct: 0
+  },
+  {
+    question: "Cái chung chỉ tồn tại trong cái gì?",
+    options: ["Cái riêng", "Tư duy thuần túy", "Không gian trống rỗng", "Sách vở"],
+    correct: 0
+  },
+  {
+    question: "Hiện tượng là gì?",
+    options: ["Sự biểu hiện ra bên ngoài của bản chất", "Cái nằm sâu bên trong", "Cái không bao giờ thay đổi", "Sự tưởng tượng của con người"],
+    correct: 0
+  },
+  {
+    question: "Khả năng là phạm trù phản ánh cái gì?",
+    options: ["Cái chưa có nhưng sẽ có khi có đủ điều kiện", "Cái đã xảy ra trong quá khứ", "Cái không bao giờ có thể thực hiện", "Cái đang tồn tại thực tế"],
+    correct: 0
+  },
+  {
+    question: "Lao động là nhân tố như thế nào đối với sự hình thành ý thức?",
+    options: ["Nhân tố quyết định trực tiếp", "Nhân tố phụ trợ", "Nhân tố không quan trọng", "Nhân tố kìm hãm"],
+    correct: 0
+  },
+  {
+    question: "Ngôn ngữ đóng vai trò gì đối với ý thức?",
+    options: ["Cái vỏ vật chất của tư duy", "Nội dung của tư duy", "Sự cản trở của tư duy", "Kết quả của tư duy"],
+    correct: 0
+  },
+  {
+    question: "Thực tiễn có mấy hình thức cơ bản?",
+    options: ["3 hình thức", "2 hình thức", "4 hình thức", "5 hình thức"],
+    correct: 0
+  }
+  {
+    question: "Tiêu chuẩn khách quan để phân biệt các chế độ xã hội trong lịch sử là gì?",
+    options: ["Hình thái kinh tế - xã hội", "Ý muốn của người đứng đầu", "Trình độ văn hóa", "Số lượng dân cư"],
+    correct: 0
+  },
+  {
+    question: "Yếu tố nào là cơ sở hạ tầng của xã hội?",
+    options: ["Toàn bộ những quan hệ sản xuất hợp thành cơ cấu kinh tế", "Các công trình xây dựng", "Hệ thống giao thông", "Các quan điểm chính trị"],
+    correct: 0
+  },
+  {
+    question: "Quan hệ giữa cơ sở hạ tầng và kiến trúc thượng tầng là quan hệ gì?",
+    options: ["Cơ sở hạ tầng quyết định kiến trúc thượng tầng", "Kiến trúc thượng tầng quyết định cơ sở hạ tầng", "Hai yếu tố không liên quan", "Quan hệ phụ thuộc hoàn toàn vào nhà nước"],
+    correct: 0
+  },
+  {
+    question: "Tính giai cấp của kiến trúc thượng tầng thể hiện rõ nhất ở yếu tố nào?",
+    options: ["Nhà nước", "Nghệ thuật", "Ngôn ngữ", "Khoa học tự nhiên"],
+    correct: 0
+  },
+  {
+    question: "Sự biến đổi của hình thái kinh tế - xã hội bắt đầu từ sự biến đổi của yếu tố nào?",
+    options: ["Lực lượng sản xuất", "Pháp luật", "Tôn giáo", "Đạo đức"],
+    correct: 0
+  },
+  {
+    question: "Theo quan điểm của Mác, con người là gì?",
+    options: ["Tổng hòa các quan hệ xã hội", "Một thực thể sinh học thuần túy", "Sản phẩm của thượng đế", "Một thực thể tâm linh"],
+    correct: 0
+  },
+  {
+    question: "Lực lượng quyết định sự phát triển của lịch sử là ai?",
+    options: ["Quần chúng nhân dân", "Các vĩ nhân, lãnh tụ", "Các nhà khoa học", "Các nhà tư tưởng"],
+    correct: 0
+  },
+  {
+    question: "Tại sao quần chúng nhân dân là người sáng tạo chân chính ra lịch sử?",
+    options: ["Họ là lực lượng sản xuất vật chất cơ bản", "Họ có số lượng đông nhất", "Họ luôn đoàn kết", "Họ có sức mạnh cơ bắp"],
+    correct: 0
+  },
+  {
+    question: "Vai trò của lãnh tụ đối với phong trào quần chúng là gì?",
+    options: ["Định hướng, tổ chức và thúc đẩy phong trào", "Thay thế hoàn toàn sức mạnh quần chúng", "Không có vai trò gì quan trọng", "Quyết định thay cho lịch sử"],
+    correct: 0
+  },
+  {
+    question: "Bản chất của con người được hình thành từ đâu?",
+    options: ["Từ thực tiễn xã hội và các quan hệ xã hội", "Từ khi mới sinh ra trong gen", "Do môi trường tự nhiên quyết định", "Do sự giáo dục thuần túy"],
+    correct: 0
+  },
+  {
+    question: "Giải phóng con người theo triết học Mác trước hết là giải phóng cái gì?",
+    options: ["Giải phóng về mặt kinh tế - xã hội", "Giải phóng tư duy", "Giải phóng niềm tin", "Giải phóng sức lao động chân tay"],
+    correct: 0
+  },
+  {
+    question: "Sự phản ánh của ý thức xã hội đối với tồn tại xã hội có tính chất gì?",
+    options: ["Tính độc lập tương đối", "Tính phụ thuộc tuyệt đối", "Tính máy móc", "Tính ngẫu nhiên"],
+    correct: 0
+  },
+  {
+    question: "Tâm lý xã hội là gì?",
+    options: ["Những tình cảm, ước muốn, thói quen hình thành trực tiếp", "Những học thuyết khoa học", "Các quy định của nhà nước", "Sự tưởng tượng của cá nhân"],
+    correct: 0
+  },];
+    
 
     // Game state
     let gameState = {
